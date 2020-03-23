@@ -176,6 +176,10 @@ MAC_HOST = {
         "cpu": "x86-64",
     },
     "caches": [swarming.cache("osx_sdk")],
+    # xcode installation can take a while, particularly when running
+    # concurrently on multiple VMs on the same host. See crbug.com/1063870
+    # for more context.
+    "execution_timeout": 60 * time.minute,
 }
 
 WIN_HOST = {
