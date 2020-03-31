@@ -275,6 +275,7 @@ ci_builder("mac_small", MAC_HOST, category="mac", short_name="sm")
 ci_builder("win32", WIN_HOST, category="win|32", short_name="dbg")
 ci_builder("win32_nasm", WIN_HOST, category="win|32", short_name="nasm")
 ci_builder("win32_rel", WIN_HOST, category="win|32", short_name="rel")
+ci_builder("win32_sde", WIN_HOST, category="win|32", short_name="sde")
 ci_builder("win32_small", WIN_HOST, category="win|32", short_name="sm")
 ci_builder("win32_vs2017", WIN_HOST, category="win|32|vs 2017",
            short_name="dbg")
@@ -283,6 +284,7 @@ ci_builder("win32_vs2017_clang", WIN_HOST, category="win|32|vs 2017",
 ci_builder("win64", WIN_HOST, category="win|64", short_name="dbg")
 ci_builder("win64_nasm", WIN_HOST, category="win|64", short_name="nasm")
 ci_builder("win64_rel", WIN_HOST, category="win|64", short_name="rel")
+ci_builder("win64_sde", WIN_HOST, category="win|64", short_name="sde")
 ci_builder("win64_small", WIN_HOST, category="win|64", short_name="sm")
 ci_builder("win64_vs2017", WIN_HOST, category="win|64|vs 2017",
            short_name="dbg")
