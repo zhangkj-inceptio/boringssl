@@ -493,6 +493,7 @@ tool_sources = [
     "src/tool/client.cc",
     "src/tool/const.cc",
     "src/tool/digest.cc",
+    "src/tool/fd.cc",
     "src/tool/file.cc",
     "src/tool/generate_ed25519.cc",
     "src/tool/genrsa.cc",
