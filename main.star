@@ -129,6 +129,9 @@ def ci_builder(
         short_name = None):
     dimensions = dict(host["dimensions"])
     dimensions["pool"] = "luci.flex.ci"
+    caches = [swarming.cache("gocache"), swarming.cache("gopath")]
+    if "caches" in host:
+        caches += host["caches"]
     builder = luci.builder(
         name = name,
         bucket = "ci",
@@ -139,7 +142,7 @@ def ci_builder(
         service_account = "boringssl-ci-builder@chops-service-accounts.iam.gserviceaccount.com",
         dimensions = dimensions,
         execution_timeout = host.get("execution_timeout", DEFAULT_TIMEOUT),
-        caches = host.get("caches"),
+        caches = caches,
         notifies = [notifier],
         triggered_by = [poller],
         properties = {
