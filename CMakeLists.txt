@@ -642,7 +642,11 @@ add_executable(
 
 target_link_libraries(bssl ssl crypto)
 
-if(NOT MSVC AND NOT ANDROID)
+if(NOT WIN32 AND NOT ANDROID)
   target_link_libraries(crypto pthread)
+endif()
+
+if(WIN32)
+  target_link_libraries(bssl ws2_32)
 endif()
 
