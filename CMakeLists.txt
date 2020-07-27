@@ -454,6 +454,7 @@ add_library(
   src/crypto/fipsmodule/fips_shared_support.c
   src/crypto/fipsmodule/is_fips.c
   src/crypto/hkdf/hkdf.c
+  src/crypto/hpke/hpke.c
   src/crypto/hrss/hrss.c
   src/crypto/lhash/lhash.c
   src/crypto/mem.c
