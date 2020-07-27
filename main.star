@@ -204,14 +204,6 @@ WIN_HOST = {
     "caches": [swarming.cache("win_toolchain")],
 }
 
-WIN7_HOST = {
-    "dimensions": {
-        "os": "Windows-7-SP1",
-        "cpu": "x86-64",
-    },
-    "caches": [swarming.cache("win_toolchain")],
-}
-
 # The Android tests take longer to run. See https://crbug.com/900953.
 ANDROID_TIMEOUT = 60 * time.minute
 
@@ -431,21 +423,13 @@ cq_builder("linux_small", LINUX_HOST)
 cq_builder("mac", MAC_HOST)
 cq_builder("mac_rel", MAC_HOST)
 cq_builder("mac_small", MAC_HOST)
-
-# Historically, the VS2015 builders used Windows 7. The VS2017 builders use
-# Windows 10 because there is more capacity available, and they are not affected
-# by the E:\b\depot_tools issue of https://crbug.com/852609.
-#
-# TODO(davidben): There is more Windows 10 capacity, so switch the VS2015
-# builders to Windows 10 when unifying the CI and CQ configuration. We can then
-# add Windows 7 coverage to the CI rather than CQ if we need it.
-cq_builder("win32", WIN7_HOST)
+cq_builder("win32", WIN_HOST)
 cq_builder("win32_clang_vs2017_compile", WIN_HOST)
-cq_builder("win32_rel", WIN7_HOST)
-cq_builder("win32_small", WIN7_HOST)
+cq_builder("win32_rel", WIN_HOST)
+cq_builder("win32_small", WIN_HOST)
 cq_builder("win32_vs2017_compile", WIN_HOST)
-cq_builder("win64", WIN7_HOST)
+cq_builder("win64", WIN_HOST)
 cq_builder("win64_clang_vs2017_compile", WIN_HOST)
-cq_builder("win64_rel", WIN7_HOST)
-cq_builder("win64_small", WIN7_HOST)
+cq_builder("win64_rel", WIN_HOST)
+cq_builder("win64_small", WIN_HOST)
 cq_builder("win64_vs2017_compile", WIN_HOST)
