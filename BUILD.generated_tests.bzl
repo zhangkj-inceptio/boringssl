@@ -11,6 +11,7 @@ test_support_sources = [
     "src/crypto/cpu-arm-linux.h",
     "src/crypto/curve25519/curve25519_tables.h",
     "src/crypto/curve25519/internal.h",
+    "src/crypto/dsa/internal.h",
     "src/crypto/ec_extra/internal.h",
     "src/crypto/err/internal.h",
     "src/crypto/evp/internal.h",
