@@ -481,12 +481,10 @@ crypto_sources = [
     "src/crypto/x509v3/v3_pci.c",
     "src/crypto/x509v3/v3_pcia.c",
     "src/crypto/x509v3/v3_pcons.c",
-    "src/crypto/x509v3/v3_pku.c",
     "src/crypto/x509v3/v3_pmaps.c",
     "src/crypto/x509v3/v3_prn.c",
     "src/crypto/x509v3/v3_purp.c",
     "src/crypto/x509v3/v3_skey.c",
-    "src/crypto/x509v3/v3_sxnet.c",
     "src/crypto/x509v3/v3_utl.c",
 ]
 
