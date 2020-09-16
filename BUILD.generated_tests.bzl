@@ -89,6 +89,7 @@ crypto_test_sources = [
     "src/crypto/compiler_test.cc",
     "src/crypto/constant_time_test.cc",
     "src/crypto/cpu-arm-linux_test.cc",
+    "src/crypto/crypto_test.cc",
     "src/crypto/curve25519/ed25519_test.cc",
     "src/crypto/curve25519/spake25519_test.cc",
     "src/crypto/curve25519/x25519_test.cc",
