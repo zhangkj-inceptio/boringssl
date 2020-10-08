@@ -495,6 +495,7 @@ add_library(
   src/crypto/thread_win.c
   src/crypto/trust_token/pmbtoken.c
   src/crypto/trust_token/trust_token.c
+  src/crypto/trust_token/voprf.c
   src/crypto/x509/a_digest.c
   src/crypto/x509/a_sign.c
   src/crypto/x509/a_strex.c
