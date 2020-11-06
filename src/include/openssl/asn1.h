@@ -179,11 +179,6 @@ struct asn1_object_st
 DEFINE_STACK_OF(ASN1_OBJECT)
 
 #define ASN1_STRING_FLAG_BITS_LEFT 0x08 /* Set if 0x07 has bits left value */
-/* This indicates that the ASN1_STRING is not a real value but just a place
- * holder for the location where indefinite length constructed data should
- * be inserted in the memory buffer 
- */
-#define ASN1_STRING_FLAG_NDEF 0x010 
 
 /* This flag is used by ASN1 code to indicate an ASN1_STRING is an MSTRING
  * type.
@@ -279,9 +274,6 @@ typedef struct ASN1_VALUE_st ASN1_VALUE;
 	OPENSSL_EXPORT type *d2i_##name(type **a, const unsigned char **in, long len); \
 	OPENSSL_EXPORT int i2d_##name(const type *a, unsigned char **out); \
 	DECLARE_ASN1_ITEM(name)
-
-#define	DECLARE_ASN1_NDEF_FUNCTION(name) \
-	OPENSSL_EXPORT int i2d_##name##_NDEF(name *a, unsigned char **out);
 
 #define DECLARE_ASN1_FUNCTIONS_const(name) \
 	DECLARE_ASN1_ALLOC_FUNCTIONS(name) \
@@ -707,8 +699,6 @@ DECLARE_ASN1_FUNCTIONS(ASN1_UTCTIME)
 DECLARE_ASN1_FUNCTIONS(ASN1_GENERALIZEDTIME)
 DECLARE_ASN1_FUNCTIONS(ASN1_TIME)
 
-DECLARE_ASN1_ITEM(ASN1_OCTET_STRING_NDEF)
-
 OPENSSL_EXPORT ASN1_TIME *ASN1_TIME_set(ASN1_TIME *s,time_t t);
 OPENSSL_EXPORT ASN1_TIME *ASN1_TIME_adj(ASN1_TIME *s,time_t t, int offset_day, long offset_sec);
 OPENSSL_EXPORT int ASN1_TIME_check(const ASN1_TIME *t);
@@ -789,7 +779,6 @@ OPENSSL_EXPORT ASN1_VALUE *ASN1_item_new(const ASN1_ITEM *it);
 OPENSSL_EXPORT void ASN1_item_free(ASN1_VALUE *val, const ASN1_ITEM *it);
 OPENSSL_EXPORT ASN1_VALUE * ASN1_item_d2i(ASN1_VALUE **val, const unsigned char **in, long len, const ASN1_ITEM *it);
 OPENSSL_EXPORT int ASN1_item_i2d(ASN1_VALUE *val, unsigned char **out, const ASN1_ITEM *it);
-OPENSSL_EXPORT int ASN1_item_ndef_i2d(ASN1_VALUE *val, unsigned char **out, const ASN1_ITEM *it);
 
 OPENSSL_EXPORT ASN1_TYPE *ASN1_generate_nconf(const char *str, CONF *nconf);
 OPENSSL_EXPORT ASN1_TYPE *ASN1_generate_v3(const char *str, X509V3_CTX *cnf);
