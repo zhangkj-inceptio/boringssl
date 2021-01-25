@@ -68,7 +68,7 @@ elseif(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "amd64")
   set(ARCH "x86_64")
 elseif(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "AMD64")
   # cmake reports AMD64 on Windows, but we might be building for 32-bit.
-  if(CMAKE_CL_64)
+  if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(ARCH "x86_64")
   else()
     set(ARCH "x86")
@@ -416,6 +416,7 @@ add_library(
   src/crypto/cpu-intel.c
   src/crypto/cpu-ppc64le.c
   src/crypto/crypto.c
+  src/crypto/curve25519/curve25519.c
   src/crypto/curve25519/spake25519.c
   src/crypto/dh/check.c
   src/crypto/dh/dh.c
@@ -426,6 +427,7 @@ add_library(
   src/crypto/dsa/dsa_asn1.c
   src/crypto/ec_extra/ec_asn1.c
   src/crypto/ec_extra/ec_derive.c
+  src/crypto/ec_extra/hash_to_curve.c
   src/crypto/ecdh_extra/ecdh_extra.c
   src/crypto/ecdsa_extra/ecdsa_asn1.c
   src/crypto/engine/engine.c
@@ -452,6 +454,7 @@ add_library(
   src/crypto/fipsmodule/fips_shared_support.c
   src/crypto/fipsmodule/is_fips.c
   src/crypto/hkdf/hkdf.c
+  src/crypto/hpke/hpke.c
   src/crypto/hrss/hrss.c
   src/crypto/lhash/lhash.c
   src/crypto/mem.c
@@ -490,7 +493,9 @@ add_library(
   src/crypto/thread_none.c
   src/crypto/thread_pthread.c
   src/crypto/thread_win.c
-  src/crypto/trust_token/privacy_pass.c
+  src/crypto/trust_token/pmbtoken.c
+  src/crypto/trust_token/trust_token.c
+  src/crypto/trust_token/voprf.c
   src/crypto/x509/a_digest.c
   src/crypto/x509/a_sign.c
   src/crypto/x509/a_strex.c
@@ -566,14 +571,11 @@ add_library(
   src/crypto/x509v3/v3_pci.c
   src/crypto/x509v3/v3_pcia.c
   src/crypto/x509v3/v3_pcons.c
-  src/crypto/x509v3/v3_pku.c
   src/crypto/x509v3/v3_pmaps.c
   src/crypto/x509v3/v3_prn.c
   src/crypto/x509v3/v3_purp.c
   src/crypto/x509v3/v3_skey.c
-  src/crypto/x509v3/v3_sxnet.c
   src/crypto/x509v3/v3_utl.c
-  src/third_party/fiat/curve25519.c
 )
 
 add_library(
@@ -625,6 +627,7 @@ add_executable(
   src/tool/client.cc
   src/tool/const.cc
   src/tool/digest.cc
+  src/tool/fd.cc
   src/tool/file.cc
   src/tool/generate_ed25519.cc
   src/tool/genrsa.cc
@@ -639,7 +642,11 @@ add_executable(
 
 target_link_libraries(bssl ssl crypto)
 
-if(NOT MSVC AND NOT ANDROID)
+if(NOT WIN32 AND NOT ANDROID)
   target_link_libraries(crypto pthread)
+endif()
+
+if(WIN32)
+  target_link_libraries(bssl ws2_32)
 endif()
 
