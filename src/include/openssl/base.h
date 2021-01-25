@@ -156,6 +156,10 @@ extern "C" {
 
 #if defined(__ANDROID_API__)
 #define OPENSSL_ANDROID
+#if defined(BORINGSSL_FIPS)
+// The FIPS module on Android passively receives entropy.
+#define BORINGSSL_FIPS_PASSIVE_ENTROPY
+#endif
 #endif
 
 // BoringSSL requires platform's locking APIs to make internal global state
@@ -187,7 +191,7 @@ extern "C" {
 // A consumer may use this symbol in the preprocessor to temporarily build
 // against multiple revisions of BoringSSL at the same time. It is not
 // recommended to do so for longer than is necessary.
-#define BORINGSSL_API_VERSION 12
+#define BORINGSSL_API_VERSION 14
 
 #if defined(BORINGSSL_SHARED_LIBRARY)
 

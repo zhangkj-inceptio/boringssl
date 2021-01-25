@@ -55,6 +55,7 @@ const Flag<bool> kBoolFlags[] = {
     {"-dtls", &TestConfig::is_dtls},
     {"-quic", &TestConfig::is_quic},
     {"-fallback-scsv", &TestConfig::fallback_scsv},
+    {"-enable-ech-grease", &TestConfig::enable_ech_grease},
     {"-require-any-client-certificate",
      &TestConfig::require_any_client_certificate},
     {"-false-start", &TestConfig::false_start},
@@ -73,6 +74,7 @@ const Flag<bool> kBoolFlags[] = {
     {"-expect-session-miss", &TestConfig::expect_session_miss},
     {"-decline-alpn", &TestConfig::decline_alpn},
     {"-select-empty-alpn", &TestConfig::select_empty_alpn},
+    {"-defer-alps", &TestConfig::defer_alps},
     {"-expect-extended-master-secret",
      &TestConfig::expect_extended_master_secret},
     {"-enable-ocsp-stapling", &TestConfig::enable_ocsp_stapling},
@@ -181,6 +183,7 @@ const Flag<std::string> kStringFlags[] = {
     {"-handshaker-path", &TestConfig::handshaker_path},
     {"-delegated-credential", &TestConfig::delegated_credential},
     {"-expect-early-data-reason", &TestConfig::expect_early_data_reason},
+    {"-quic-early-data-context", &TestConfig::quic_early_data_context},
 };
 
 // TODO(davidben): When we can depend on C++17 or Abseil, switch this to
@@ -227,6 +230,7 @@ const Flag<int> kIntFlags[] = {
     {"-max-send-fragment", &TestConfig::max_send_fragment},
     {"-read-size", &TestConfig::read_size},
     {"-expect-ticket-age-skew", &TestConfig::expect_ticket_age_skew},
+    {"-quic-use-legacy-codepoint", &TestConfig::quic_use_legacy_codepoint},
 };
 
 const Flag<std::vector<int>> kIntVectorFlags[] = {
@@ -672,6 +676,19 @@ static int AlpnSelectCallback(SSL *ssl, const uint8_t **out, uint8_t *outlen,
            0)) {
     fprintf(stderr, "bad ALPN select callback inputs.\n");
     exit(1);
+  }
+
+  if (config->defer_alps) {
+    for (const auto &pair : config->application_settings) {
+      if (!SSL_add_application_settings(
+              ssl, reinterpret_cast<const uint8_t *>(pair.first.data()),
+              pair.first.size(),
+              reinterpret_cast<const uint8_t *>(pair.second.data()),
+              pair.second.size())) {
+        fprintf(stderr, "error configuring ALPS.\n");
+        exit(1);
+      }
+    }
   }
 
   assert(config->select_alpn.empty() || !config->select_empty_alpn);
@@ -1576,6 +1593,9 @@ bssl::UniquePtr<SSL> TestConfig::NewSSL(
   if (!expect_channel_id.empty() || enable_channel_id) {
     SSL_set_tls_channel_id_enabled(ssl.get(), 1);
   }
+  if (enable_ech_grease) {
+    SSL_set_enable_ech_grease(ssl.get(), 1);
+  }
   if (!send_channel_id.empty()) {
     SSL_set_tls_channel_id_enabled(ssl.get(), 1);
     if (!async) {
@@ -1602,13 +1622,15 @@ bssl::UniquePtr<SSL> TestConfig::NewSSL(
           advertise_alpn.size()) != 0) {
     return nullptr;
   }
-  for (const auto &pair : application_settings) {
-    if (!SSL_add_application_settings(
-            ssl.get(), reinterpret_cast<const uint8_t *>(pair.first.data()),
-            pair.first.size(),
-            reinterpret_cast<const uint8_t *>(pair.second.data()),
-            pair.second.size())) {
-      return nullptr;
+  if (!defer_alps) {
+    for (const auto &pair : application_settings) {
+      if (!SSL_add_application_settings(
+              ssl.get(), reinterpret_cast<const uint8_t *>(pair.first.data()),
+              pair.first.size(),
+              reinterpret_cast<const uint8_t *>(pair.second.data()),
+              pair.second.size())) {
+        return nullptr;
+      }
     }
   }
   if (!psk.empty()) {
@@ -1716,6 +1738,9 @@ bssl::UniquePtr<SSL> TestConfig::NewSSL(
   if (max_send_fragment > 0) {
     SSL_set_max_send_fragment(ssl.get(), max_send_fragment);
   }
+  if (quic_use_legacy_codepoint != -1) {
+    SSL_set_quic_use_legacy_codepoint(ssl.get(), quic_use_legacy_codepoint);
+  }
   if (!quic_transport_params.empty()) {
     if (!SSL_set_quic_transport_params(
             ssl.get(),
@@ -1775,6 +1800,14 @@ bssl::UniquePtr<SSL> TestConfig::NewSSL(
       fprintf(stderr, "SSL_set1_delegated_credential failed.\n");
       return nullptr;
     }
+  }
+
+  if (!quic_early_data_context.empty() &&
+      !SSL_set_quic_early_data_context(
+          ssl.get(),
+          reinterpret_cast<const uint8_t *>(quic_early_data_context.data()),
+          quic_early_data_context.size())) {
+    return nullptr;
   }
 
   return ssl;

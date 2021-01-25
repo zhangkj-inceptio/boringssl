@@ -288,6 +288,21 @@ set(
 )
 
 set(
+  CRYPTO_win_aarch64_SOURCES
+
+  win-aarch64/crypto/chacha/chacha-armv8.S
+  win-aarch64/crypto/fipsmodule/aesv8-armx64.S
+  win-aarch64/crypto/fipsmodule/armv8-mont.S
+  win-aarch64/crypto/fipsmodule/ghash-neon-armv8.S
+  win-aarch64/crypto/fipsmodule/ghashv8-armx64.S
+  win-aarch64/crypto/fipsmodule/sha1-armv8.S
+  win-aarch64/crypto/fipsmodule/sha256-armv8.S
+  win-aarch64/crypto/fipsmodule/sha512-armv8.S
+  win-aarch64/crypto/fipsmodule/vpaes-armv8.S
+  win-aarch64/crypto/test/trampoline-armv8.S
+)
+
+set(
   CRYPTO_win_x86_SOURCES
 
   win-x86/crypto/chacha/chacha-x86.asm
@@ -411,6 +426,7 @@ add_library(
   src/crypto/conf/conf.c
   src/crypto/cpu-aarch64-fuchsia.c
   src/crypto/cpu-aarch64-linux.c
+  src/crypto/cpu-aarch64-win.c
   src/crypto/cpu-arm-linux.c
   src/crypto/cpu-arm.c
   src/crypto/cpu-intel.c
@@ -418,10 +434,8 @@ add_library(
   src/crypto/crypto.c
   src/crypto/curve25519/curve25519.c
   src/crypto/curve25519/spake25519.c
-  src/crypto/dh/check.c
-  src/crypto/dh/dh.c
-  src/crypto/dh/dh_asn1.c
-  src/crypto/dh/params.c
+  src/crypto/dh_extra/dh_asn1.c
+  src/crypto/dh_extra/params.c
   src/crypto/digest_extra/digest_extra.c
   src/crypto/dsa/dsa.c
   src/crypto/dsa/dsa_asn1.c
@@ -480,6 +494,7 @@ add_library(
   src/crypto/rand_extra/deterministic.c
   src/crypto/rand_extra/forkunsafe.c
   src/crypto/rand_extra/fuchsia.c
+  src/crypto/rand_extra/passive.c
   src/crypto/rand_extra/rand_extra.c
   src/crypto/rand_extra/windows.c
   src/crypto/rc4/rc4.c

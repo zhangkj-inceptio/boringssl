@@ -39,6 +39,8 @@ fips_fragments = [
     "src/crypto/fipsmodule/cipher/e_aes.c",
     "src/crypto/fipsmodule/cipher/e_des.c",
     "src/crypto/fipsmodule/des/des.c",
+    "src/crypto/fipsmodule/dh/check.c",
+    "src/crypto/fipsmodule/dh/dh.c",
     "src/crypto/fipsmodule/digest/digest.c",
     "src/crypto/fipsmodule/digest/digests.c",
     "src/crypto/fipsmodule/ec/ec.c",
@@ -322,6 +324,7 @@ crypto_sources = [
     "src/crypto/conf/conf.c",
     "src/crypto/cpu-aarch64-fuchsia.c",
     "src/crypto/cpu-aarch64-linux.c",
+    "src/crypto/cpu-aarch64-win.c",
     "src/crypto/cpu-arm-linux.c",
     "src/crypto/cpu-arm.c",
     "src/crypto/cpu-intel.c",
@@ -329,10 +332,8 @@ crypto_sources = [
     "src/crypto/crypto.c",
     "src/crypto/curve25519/curve25519.c",
     "src/crypto/curve25519/spake25519.c",
-    "src/crypto/dh/check.c",
-    "src/crypto/dh/dh.c",
-    "src/crypto/dh/dh_asn1.c",
-    "src/crypto/dh/params.c",
+    "src/crypto/dh_extra/dh_asn1.c",
+    "src/crypto/dh_extra/params.c",
     "src/crypto/digest_extra/digest_extra.c",
     "src/crypto/dsa/dsa.c",
     "src/crypto/dsa/dsa_asn1.c",
@@ -391,6 +392,7 @@ crypto_sources = [
     "src/crypto/rand_extra/deterministic.c",
     "src/crypto/rand_extra/forkunsafe.c",
     "src/crypto/rand_extra/fuchsia.c",
+    "src/crypto/rand_extra/passive.c",
     "src/crypto/rand_extra/rand_extra.c",
     "src/crypto/rand_extra/windows.c",
     "src/crypto/rc4/rc4.c",
@@ -650,6 +652,19 @@ crypto_sources_mac_x86_64 = [
     "mac-x86_64/crypto/fipsmodule/x86_64-mont.S",
     "mac-x86_64/crypto/fipsmodule/x86_64-mont5.S",
     "mac-x86_64/crypto/test/trampoline-x86_64.S",
+]
+
+crypto_sources_win_aarch64 = [
+    "win-aarch64/crypto/chacha/chacha-armv8.S",
+    "win-aarch64/crypto/fipsmodule/aesv8-armx64.S",
+    "win-aarch64/crypto/fipsmodule/armv8-mont.S",
+    "win-aarch64/crypto/fipsmodule/ghash-neon-armv8.S",
+    "win-aarch64/crypto/fipsmodule/ghashv8-armx64.S",
+    "win-aarch64/crypto/fipsmodule/sha1-armv8.S",
+    "win-aarch64/crypto/fipsmodule/sha256-armv8.S",
+    "win-aarch64/crypto/fipsmodule/sha512-armv8.S",
+    "win-aarch64/crypto/fipsmodule/vpaes-armv8.S",
+    "win-aarch64/crypto/test/trampoline-armv8.S",
 ]
 
 crypto_sources_win_x86 = [
