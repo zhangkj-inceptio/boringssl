@@ -156,7 +156,7 @@ def ci_builder(
         short_name = short_name,
     )
 
-def cq_builder(name, host, *, recipe = "boringssl", enabled = True):
+def cq_builder(name, host, *, recipe = "boringssl", cq_enabled = True):
     dimensions = dict(host["dimensions"])
     dimensions["pool"] = "luci.flex.try"
     builder = luci.builder(
@@ -174,8 +174,25 @@ def cq_builder(name, host, *, recipe = "boringssl", enabled = True):
     luci.cq_tryjob_verifier(
         builder = builder,
         cq_group = cq_group,
-        includable_only = not enabled,
+        includable_only = not cq_enabled,
     )
+
+def both_builders(
+        name,
+        host,
+        *,
+        recipe = "boringssl",
+        category = None,
+        short_name = None,
+        cq_enabled = True):
+    ci_builder(
+        name,
+        host,
+        recipe = recipe,
+        category = category,
+        short_name = short_name,
+    )
+    cq_builder(name, host, recipe = recipe, cq_enabled = cq_enabled)
 
 LINUX_HOST = {
     "dimensions": {
@@ -263,98 +280,111 @@ ci_builder(
     category = "android|arm",
     short_name = "rel",
 )
-ci_builder("docs", LINUX_HOST, recipe = "boringssl_docs", short_name = "doc")
-ci_builder("ios_compile", MAC_HOST, category = "ios", short_name = "32")
-ci_builder("ios64_compile", MAC_HOST, category = "ios", short_name = "64")
-ci_builder("linux", LINUX_HOST, category = "linux", short_name = "dbg")
-ci_builder("linux_rel", LINUX_HOST, category = "linux", short_name = "rel")
-ci_builder("linux32", LINUX_HOST, category = "linux|32", short_name = "dbg")
-ci_builder("linux32_rel", LINUX_HOST, category = "linux|32", short_name = "rel")
+
+cq_builder("android_aarch64_compile", LINUX_HOST)
+cq_builder("android_aarch64_fips_compile", LINUX_HOST)
+cq_builder("android_aarch64_rel_compile", LINUX_HOST, cq_enabled = False)
+cq_builder("android_arm_armmode_compile", LINUX_HOST)
+cq_builder("android_arm_armmode_rel_compile", LINUX_HOST, cq_enabled = False)
+cq_builder("android_arm_compile", LINUX_HOST)
+cq_builder("android_arm_rel_compile", LINUX_HOST, cq_enabled = False)
+
+both_builders("docs", LINUX_HOST, recipe = "boringssl_docs", short_name = "doc")
+both_builders("ios_compile", MAC_HOST, category = "ios", short_name = "32")
+both_builders("ios64_compile", MAC_HOST, category = "ios", short_name = "64")
+both_builders("linux", LINUX_HOST, category = "linux", short_name = "dbg")
+both_builders("linux_rel", LINUX_HOST, category = "linux", short_name = "rel")
+both_builders("linux32", LINUX_HOST, category = "linux|32", short_name = "dbg")
+both_builders("linux32_rel", LINUX_HOST, category = "linux|32", short_name = "rel")
 ci_builder("linux32_sde", LINUX_HOST, category = "linux|32", short_name = "sde")
-ci_builder(
+both_builders(
     "linux32_nosse2_noasm",
     LINUX_HOST,
     category = "linux|32",
     short_name = "nosse2",
 )
-ci_builder(
+both_builders(
     "linux_clang_cfi",
     LINUX_HOST,
     category = "linux|clang",
     short_name = "cfi",
+    cq_enabled = False,
 )
-ci_builder(
+both_builders(
     "linux_clang_rel",
     LINUX_HOST,
     category = "linux|clang",
     short_name = "rel",
 )
-ci_builder(
+both_builders(
     "linux_clang_rel_msan",
     LINUX_HOST,
     category = "linux|clang",
     short_name = "msan",
 )
-ci_builder(
+both_builders(
     "linux_clang_rel_tsan",
     LINUX_HOST,
     category = "linux|clang",
     short_name = "tsan",
+    cq_enabled = False,
 )
-ci_builder("linux_fips", LINUX_HOST, category = "linux|fips", short_name = "dbg")
-ci_builder(
+both_builders("linux_fips", LINUX_HOST, category = "linux|fips", short_name = "dbg")
+both_builders(
     "linux_fips_rel",
     LINUX_HOST,
     category = "linux|fips",
     short_name = "rel",
 )
-ci_builder(
+both_builders(
     "linux_fips_clang",
     LINUX_HOST,
     category = "linux|fips|clang",
     short_name = "dbg",
 )
-ci_builder(
+both_builders(
     "linux_fips_clang_rel",
     LINUX_HOST,
     category = "linux|fips|clang",
     short_name = "rel",
 )
-ci_builder(
+both_builders(
     "linux_fips_noasm_asan",
     LINUX_HOST,
     category = "linux|fips",
     short_name = "asan",
 )
-ci_builder("linux_fuzz", LINUX_HOST, category = "linux", short_name = "fuzz")
-ci_builder(
+both_builders("linux_fuzz", LINUX_HOST, category = "linux", short_name = "fuzz")
+both_builders(
     "linux_noasm_asan",
     LINUX_HOST,
     category = "linux",
     short_name = "asan",
 )
-ci_builder(
+both_builders(
     "linux_nothreads",
     LINUX_HOST,
     category = "linux",
     short_name = "not",
 )
 ci_builder("linux_sde", LINUX_HOST, category = "linux", short_name = "sde")
-ci_builder("linux_shared", LINUX_HOST, category = "linux", short_name = "sh")
-ci_builder("linux_small", LINUX_HOST, category = "linux", short_name = "sm")
-ci_builder(
+both_builders("linux_shared", LINUX_HOST, category = "linux", short_name = "sh")
+both_builders("linux_small", LINUX_HOST, category = "linux", short_name = "sm")
+both_builders(
     "linux_nosse2_noasm",
     LINUX_HOST,
     category = "linux",
     short_name = "nosse2",
 )
-ci_builder("mac", MAC_HOST, category = "mac", short_name = "dbg")
-ci_builder("mac_rel", MAC_HOST, category = "mac", short_name = "rel")
-ci_builder("mac_small", MAC_HOST, category = "mac", short_name = "sm")
-ci_builder("win32", WIN_HOST, category = "win|32", short_name = "dbg")
-ci_builder("win32_rel", WIN_HOST, category = "win|32", short_name = "rel")
+both_builders("mac", MAC_HOST, category = "mac", short_name = "dbg")
+both_builders("mac_rel", MAC_HOST, category = "mac", short_name = "rel")
+both_builders("mac_small", MAC_HOST, category = "mac", short_name = "sm")
+both_builders("win32", WIN_HOST, category = "win|32", short_name = "dbg")
+both_builders("win32_rel", WIN_HOST, category = "win|32", short_name = "rel")
 ci_builder("win32_sde", WIN_HOST, category = "win|32", short_name = "sde")
-ci_builder("win32_small", WIN_HOST, category = "win|32", short_name = "sm")
+both_builders("win32_small", WIN_HOST, category = "win|32", short_name = "sm")
+
+# To reduce cycle times, the CQ VS2017 builders are compile-only.
 ci_builder(
     "win32_vs2017",
     WIN_HOST,
@@ -367,10 +397,15 @@ ci_builder(
     category = "win|32|vs 2017",
     short_name = "clg",
 )
-ci_builder("win64", WIN_HOST, category = "win|64", short_name = "dbg")
-ci_builder("win64_rel", WIN_HOST, category = "win|64", short_name = "rel")
+cq_builder("win32_vs2017_compile", WIN_HOST)
+cq_builder("win32_clang_vs2017_compile", WIN_HOST)
+
+both_builders("win64", WIN_HOST, category = "win|64", short_name = "dbg")
+both_builders("win64_rel", WIN_HOST, category = "win|64", short_name = "rel")
 ci_builder("win64_sde", WIN_HOST, category = "win|64", short_name = "sde")
-ci_builder("win64_small", WIN_HOST, category = "win|64", short_name = "sm")
+both_builders("win64_small", WIN_HOST, category = "win|64", short_name = "sm")
+
+# To reduce cycle times, the CQ VS2017 builders are compile-only.
 ci_builder(
     "win64_vs2017",
     WIN_HOST,
@@ -383,51 +418,5 @@ ci_builder(
     category = "win|64|vs 2017",
     short_name = "clg",
 )
-
-# TODO(davidben): The CQ definitions are largely redundant with the CI
-# definitions. Most divergences are unintentional. They are defined separately
-# for now so the migration to lucicfg can preserve the old behavior. Next the
-# definitions should be merged together.
-cq_builder("android_aarch64_compile", LINUX_HOST)
-cq_builder("android_aarch64_fips_compile", LINUX_HOST)
-cq_builder("android_aarch64_rel_compile", LINUX_HOST, enabled = False)
-cq_builder("android_arm_armmode_compile", LINUX_HOST)
-cq_builder("android_arm_armmode_rel_compile", LINUX_HOST, enabled = False)
-cq_builder("android_arm_compile", LINUX_HOST)
-cq_builder("android_arm_rel_compile", LINUX_HOST, enabled = False)
-cq_builder("docs", LINUX_HOST, recipe = "boringssl_docs")
-cq_builder("ios64_compile", MAC_HOST)
-cq_builder("ios_compile", MAC_HOST)
-cq_builder("linux", LINUX_HOST)
-cq_builder("linux32", LINUX_HOST)
-cq_builder("linux32_nosse2_noasm", LINUX_HOST)
-cq_builder("linux32_rel", LINUX_HOST)
-cq_builder("linux_clang_cfi", LINUX_HOST, enabled = False)
-cq_builder("linux_clang_rel", LINUX_HOST)
-cq_builder("linux_clang_rel_msan", LINUX_HOST)
-cq_builder("linux_clang_rel_tsan", LINUX_HOST, enabled = False)
-cq_builder("linux_fips", LINUX_HOST)
-cq_builder("linux_fips_clang", LINUX_HOST)
-cq_builder("linux_fips_clang_rel", LINUX_HOST)
-cq_builder("linux_fips_noasm_asan", LINUX_HOST)
-cq_builder("linux_fips_rel", LINUX_HOST)
-cq_builder("linux_fuzz", LINUX_HOST)
-cq_builder("linux_noasm_asan", LINUX_HOST)
-cq_builder("linux_nosse2_noasm", LINUX_HOST)
-cq_builder("linux_nothreads", LINUX_HOST)
-cq_builder("linux_rel", LINUX_HOST)
-cq_builder("linux_shared", LINUX_HOST)
-cq_builder("linux_small", LINUX_HOST)
-cq_builder("mac", MAC_HOST)
-cq_builder("mac_rel", MAC_HOST)
-cq_builder("mac_small", MAC_HOST)
-cq_builder("win32", WIN_HOST)
-cq_builder("win32_clang_vs2017_compile", WIN_HOST)
-cq_builder("win32_rel", WIN_HOST)
-cq_builder("win32_small", WIN_HOST)
-cq_builder("win32_vs2017_compile", WIN_HOST)
-cq_builder("win64", WIN_HOST)
 cq_builder("win64_clang_vs2017_compile", WIN_HOST)
-cq_builder("win64_rel", WIN_HOST)
-cq_builder("win64_small", WIN_HOST)
 cq_builder("win64_vs2017_compile", WIN_HOST)
