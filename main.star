@@ -126,12 +126,15 @@ def ci_builder(
         *,
         recipe = "boringssl",
         category = None,
-        short_name = None):
+        short_name = None,
+        properties = {}):
     dimensions = dict(host["dimensions"])
     dimensions["pool"] = "luci.flex.ci"
     caches = [swarming.cache("gocache"), swarming.cache("gopath")]
     if "caches" in host:
         caches += host["caches"]
+    properties = dict(properties)
+    properties["$gatekeeper"] = {"group": "client.boringssl"}
     builder = luci.builder(
         name = name,
         bucket = "ci",
@@ -145,9 +148,7 @@ def ci_builder(
         caches = caches,
         notifies = [notifier],
         triggered_by = [poller],
-        properties = {
-            "$gatekeeper": {"group": "client.boringssl"},
-        },
+        properties = properties,
     )
     luci.console_view_entry(
         builder = builder,
@@ -156,7 +157,7 @@ def ci_builder(
         short_name = short_name,
     )
 
-def cq_builder(name, host, *, recipe = "boringssl", cq_enabled = True):
+def cq_builder(name, host, *, recipe = "boringssl", cq_enabled = True, properties = {}):
     dimensions = dict(host["dimensions"])
     dimensions["pool"] = "luci.flex.try"
     builder = luci.builder(
@@ -170,6 +171,7 @@ def cq_builder(name, host, *, recipe = "boringssl", cq_enabled = True):
         dimensions = dimensions,
         execution_timeout = host.get("execution_timeout", DEFAULT_TIMEOUT),
         caches = host.get("caches"),
+        properties = properties,
     )
     luci.cq_tryjob_verifier(
         builder = builder,
@@ -184,15 +186,33 @@ def both_builders(
         recipe = "boringssl",
         category = None,
         short_name = None,
-        cq_enabled = True):
+        cq_enabled = True,
+        cq_compile_only = False,
+        cq_host = None,
+        properties = {}):
     ci_builder(
         name,
         host,
         recipe = recipe,
         category = category,
         short_name = short_name,
+        properties = properties,
     )
-    cq_builder(name, host, recipe = recipe, cq_enabled = cq_enabled)
+    cq_name = name
+    cq_properties = dict(properties)
+    if cq_compile_only:
+        cq_name += "_compile"
+        cq_properties["run_unit_tests"] = False
+        cq_properties["run_ssl_tests"] = False
+    if cq_host == None:
+        cq_host = host
+    cq_builder(
+        cq_name,
+        cq_host,
+        recipe = recipe,
+        cq_enabled = cq_enabled,
+        properties = cq_properties,
+    )
 
 LINUX_HOST = {
     "dimensions": {
@@ -242,56 +262,91 @@ WALLEYE_HOST = {
 # properties rather than parsing names. Then we can add new configurations
 # without having to touch multiple repositories.
 
-ci_builder(
+both_builders(
     "android_aarch64",
     BULLHEAD_HOST,
     category = "android|aarch64",
     short_name = "dbg",
+    cq_host = LINUX_HOST,
+    cq_compile_only = True,
 )
-ci_builder(
+both_builders(
     "android_aarch64_rel",
     BULLHEAD_HOST,
     category = "android|aarch64",
     short_name = "rel",
+    cq_host = LINUX_HOST,
+    cq_compile_only = True,
+    cq_enabled = False,
 )
-
-# The Android FIPS configuration requires a newer device.
-ci_builder(
+both_builders(
     "android_aarch64_fips",
+    # The Android FIPS configuration requires a newer device.
     WALLEYE_HOST,
     category = "android|aarch64",
     short_name = "fips",
+    cq_host = LINUX_HOST,
+    cq_compile_only = True,
 )
-ci_builder(
+both_builders(
     "android_arm",
     BULLHEAD_HOST,
     category = "android|thumb",
     short_name = "dbg",
+    cq_host = LINUX_HOST,
+    cq_compile_only = True,
 )
-ci_builder(
+both_builders(
     "android_arm_rel",
     BULLHEAD_HOST,
     category = "android|thumb",
     short_name = "rel",
+    cq_host = LINUX_HOST,
+    cq_compile_only = True,
+    cq_enabled = False,
 )
-ci_builder(
+both_builders(
     "android_arm_armmode_rel",
     BULLHEAD_HOST,
     category = "android|arm",
     short_name = "rel",
+    cq_host = LINUX_HOST,
+    cq_compile_only = True,
+    cq_enabled = False,
 )
 
-cq_builder("android_aarch64_compile", LINUX_HOST)
-cq_builder("android_aarch64_fips_compile", LINUX_HOST)
-cq_builder("android_aarch64_rel_compile", LINUX_HOST, cq_enabled = False)
-cq_builder("android_arm_armmode_compile", LINUX_HOST)
-cq_builder("android_arm_armmode_rel_compile", LINUX_HOST, cq_enabled = False)
-cq_builder("android_arm_compile", LINUX_HOST)
-cq_builder("android_arm_rel_compile", LINUX_HOST, cq_enabled = False)
+# TODO(davidben): It's strange that the CI runs ARM mode in release mode while
+# the CQ compiles ARM mode in debug. Align these?
+cq_builder(
+    "android_arm_armmode_compile",
+    LINUX_HOST,
+    properties = {
+        "run_unit_tests": False,
+        "run_ssl_tests": False,
+    },
+)
 
 both_builders("docs", LINUX_HOST, recipe = "boringssl_docs", short_name = "doc")
-both_builders("ios_compile", MAC_HOST, category = "ios", short_name = "32")
-both_builders("ios64_compile", MAC_HOST, category = "ios", short_name = "64")
+both_builders(
+    "ios_compile",
+    MAC_HOST,
+    category = "ios",
+    short_name = "32",
+    properties = {
+        "run_unit_tests": False,
+        "run_ssl_tests": False,
+    },
+)
+both_builders(
+    "ios64_compile",
+    MAC_HOST,
+    category = "ios",
+    short_name = "64",
+    properties = {
+        "run_unit_tests": False,
+        "run_ssl_tests": False,
+    },
+)
 both_builders("linux", LINUX_HOST, category = "linux", short_name = "dbg")
 both_builders("linux_rel", LINUX_HOST, category = "linux", short_name = "rel")
 both_builders("linux32", LINUX_HOST, category = "linux|32", short_name = "dbg")
@@ -385,20 +440,26 @@ ci_builder("win32_sde", WIN_HOST, category = "win|32", short_name = "sde")
 both_builders("win32_small", WIN_HOST, category = "win|32", short_name = "sm")
 
 # To reduce cycle times, the CQ VS2017 builders are compile-only.
-ci_builder(
+both_builders(
     "win32_vs2017",
     WIN_HOST,
     category = "win|32|vs 2017",
     short_name = "dbg",
+    cq_compile_only = True,
+    properties = {
+        "gclient_vars": {"vs_version": 2017},
+    },
 )
-ci_builder(
+both_builders(
     "win32_vs2017_clang",
     WIN_HOST,
     category = "win|32|vs 2017",
     short_name = "clg",
+    cq_compile_only = True,
+    properties = {
+        "gclient_vars": {"vs_version": 2017},
+    },
 )
-cq_builder("win32_vs2017_compile", WIN_HOST)
-cq_builder("win32_clang_vs2017_compile", WIN_HOST)
 
 both_builders("win64", WIN_HOST, category = "win|64", short_name = "dbg")
 both_builders("win64_rel", WIN_HOST, category = "win|64", short_name = "rel")
@@ -406,17 +467,47 @@ ci_builder("win64_sde", WIN_HOST, category = "win|64", short_name = "sde")
 both_builders("win64_small", WIN_HOST, category = "win|64", short_name = "sm")
 
 # To reduce cycle times, the CQ VS2017 builders are compile-only.
-ci_builder(
+both_builders(
     "win64_vs2017",
     WIN_HOST,
     category = "win|64|vs 2017",
     short_name = "dbg",
+    cq_compile_only = True,
+    properties = {
+        "gclient_vars": {"vs_version": 2017},
+    },
 )
-ci_builder(
+both_builders(
     "win64_vs2017_clang",
     WIN_HOST,
     category = "win|64|vs 2017",
     short_name = "clg",
+    cq_compile_only = True,
+    properties = {
+        "gclient_vars": {"vs_version": 2017},
+    },
 )
-cq_builder("win64_clang_vs2017_compile", WIN_HOST)
-cq_builder("win64_vs2017_compile", WIN_HOST)
+
+# TODO(davidben): Once this builder works, add it to the CI and enable it on
+# the CQ.
+cq_builder(
+    "win_arm64_compile",
+    WIN_HOST,
+    cq_enabled = False,
+    properties = {
+        "cmake_args": {
+            "CMAKE_SYSTEM_NAME": "Windows",
+            "CMAKE_SYSTEM_PROCESSOR": "arm64",
+            "CMAKE_ASM_FLAGS": "-target arm64-windows",
+            "CMAKE_CXX_FLAGS": "-target arm64-windows",
+            "CMAKE_C_FLAGS": "-target arm64-windows",
+        },
+        "gclient_vars": {
+            "checkout_nasm": False,
+            "vs_version": 2017,
+        },
+        "msvc_target": "arm64",
+        "run_unit_tests": False,
+        "run_ssl_tests": False,
+    },
+)
