@@ -495,6 +495,7 @@ cq_builder(
     WIN_HOST,
     cq_enabled = False,
     properties = {
+        "clang": True,
         "cmake_args": {
             "CMAKE_SYSTEM_NAME": "Windows",
             "CMAKE_SYSTEM_PROCESSOR": "arm64",
