@@ -499,9 +499,9 @@ cq_builder(
         "cmake_args": {
             "CMAKE_SYSTEM_NAME": "Windows",
             "CMAKE_SYSTEM_PROCESSOR": "arm64",
-            "CMAKE_ASM_FLAGS": "-target arm64-windows",
-            "CMAKE_CXX_FLAGS": "-target arm64-windows",
-            "CMAKE_C_FLAGS": "-target arm64-windows",
+            "CMAKE_ASM_FLAGS": "--target=arm64-windows",
+            "CMAKE_CXX_FLAGS": "--target=arm64-windows",
+            "CMAKE_C_FLAGS": "--target=arm64-windows",
         },
         "gclient_vars": {
             "checkout_nasm": False,
