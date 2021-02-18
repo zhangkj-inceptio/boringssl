@@ -447,7 +447,7 @@ both_builders(
     short_name = "dbg",
     cq_compile_only = True,
     properties = {
-        "gclient_vars": {"vs_version": 2017},
+        "gclient_vars": {"vs_version": "2017"},
     },
 )
 both_builders(
@@ -457,7 +457,7 @@ both_builders(
     short_name = "clg",
     cq_compile_only = True,
     properties = {
-        "gclient_vars": {"vs_version": 2017},
+        "gclient_vars": {"vs_version": "2017"},
     },
 )
 
@@ -474,7 +474,7 @@ both_builders(
     short_name = "dbg",
     cq_compile_only = True,
     properties = {
-        "gclient_vars": {"vs_version": 2017},
+        "gclient_vars": {"vs_version": "2017"},
     },
 )
 both_builders(
@@ -484,7 +484,7 @@ both_builders(
     short_name = "clg",
     cq_compile_only = True,
     properties = {
-        "gclient_vars": {"vs_version": 2017},
+        "gclient_vars": {"vs_version": "2017"},
     },
 )
 
@@ -504,7 +504,7 @@ cq_builder(
         },
         "gclient_vars": {
             "checkout_nasm": False,
-            "vs_version": 2017,
+            "vs_version": "2017",
         },
         "msvc_target": "arm64",
         "run_unit_tests": False,
