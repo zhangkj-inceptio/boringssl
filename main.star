@@ -488,11 +488,11 @@ both_builders(
     },
 )
 
-# TODO(davidben): Once this builder works, add it to the CI and enable it on
-# the CQ.
-cq_builder(
+both_builders(
     "win_arm64_compile",
     WIN_HOST,
+    category = "win",
+    short_name = "arm64",
     cq_enabled = False,
     properties = {
         "clang": True,
