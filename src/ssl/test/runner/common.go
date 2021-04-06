@@ -74,7 +74,6 @@ const (
 	typeHelloVerifyRequest    uint8 = 3
 	typeNewSessionTicket      uint8 = 4
 	typeEndOfEarlyData        uint8 = 5
-	typeHelloRetryRequest     uint8 = 6
 	typeEncryptedExtensions   uint8 = 8
 	typeCertificate           uint8 = 11
 	typeServerKeyExchange     uint8 = 12
@@ -1670,10 +1669,6 @@ type ProtocolBugs struct {
 	// negotiated.
 	UseLegacySigningAlgorithm signatureAlgorithm
 
-	// SendServerHelloAsHelloRetryRequest, if true, causes the server to
-	// send ServerHello messages with a HelloRetryRequest type field.
-	SendServerHelloAsHelloRetryRequest bool
-
 	// RejectUnsolicitedKeyUpdate, if true, causes all unsolicited
 	// KeyUpdates from the peer to be rejected.
 	RejectUnsolicitedKeyUpdate bool
@@ -1701,10 +1696,6 @@ type ProtocolBugs struct {
 	// SendTLS13DowngradeRandom, if true, causes the server to send the
 	// TLS 1.3 anti-downgrade signal.
 	SendTLS13DowngradeRandom bool
-
-	// CheckTLS13DowngradeRandom, if true, causes the client to check the
-	// TLS 1.3 anti-downgrade signal regardless of its variant.
-	CheckTLS13DowngradeRandom bool
 
 	// IgnoreTLS13DowngradeRandom, if true, causes the client to ignore the
 	// TLS 1.3 anti-downgrade signal.
