@@ -4,7 +4,7 @@
 lucicfg definitions for BoringSSL's CI and CQ.
 """
 
-lucicfg.check_version("1.17.0")
+lucicfg.check_version("1.23.0")
 lucicfg.config(
     lint_checks = ["default"],
 )
@@ -49,19 +49,7 @@ luci.project(
     ],
 )
 
-luci.bucket(
-    name = "ci",
-    acls = [
-        acl.entry(
-            roles = acl.BUILDBUCKET_TRIGGERER,
-            users = "luci-scheduler@appspot.gserviceaccount.com",
-        ),
-        acl.entry(
-            roles = acl.BUILDBUCKET_OWNER,
-            users = "luci-migration@appspot.gserviceaccount.com",
-        ),
-    ],
-)
+luci.bucket( name = "ci",)
 
 luci.bucket(
     name = "try",
