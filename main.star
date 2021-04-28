@@ -8,6 +8,8 @@ lucicfg.check_version("1.23.0")
 
 # Enable LUCI Realms support.
 lucicfg.enable_experiment("crbug.com/1085650")
+# Launch 10% of builds in "realms-aware mode", crbug.com/1203847.
+luci.builder.defaults.experiments.set({"luci.use_realms": 10})
 
 lucicfg.config(
     lint_checks = ["default"],
