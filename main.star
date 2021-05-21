@@ -210,7 +210,7 @@ def both_builders(
 
 LINUX_HOST = {
     "dimensions": {
-        "os": "Ubuntu-16.04",
+        "os": "Ubuntu-18.04",
         "cpu": "x86-64",
     },
 }
