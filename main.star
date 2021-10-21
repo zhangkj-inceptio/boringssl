@@ -8,6 +8,7 @@ lucicfg.check_version("1.23.0")
 
 # Enable LUCI Realms support.
 lucicfg.enable_experiment("crbug.com/1085650")
+
 # Launch all builds in "realms-aware mode", crbug.com/1203847.
 luci.builder.defaults.experiments.set({"luci.use_realms": 100})
 
@@ -55,7 +56,7 @@ luci.project(
     ],
 )
 
-luci.bucket( name = "ci",)
+luci.bucket(name = "ci")
 
 luci.bucket(
     name = "try",
@@ -78,6 +79,7 @@ luci.milo(
 console_view = luci.console_view(
     name = "main",
     repo = REPO_URL,
+    refs = ["refs/heads/master"],
     title = "BoringSSL Main Console",
 )
 
@@ -99,6 +101,7 @@ poller = luci.gitiles_poller(
     name = "master-gitiles-trigger",
     bucket = "ci",
     repo = REPO_URL,
+    refs = ["refs/heads/master"],
 )
 
 luci.logdog(
@@ -121,6 +124,7 @@ def ci_builder(
         recipe = "boringssl",
         category = None,
         short_name = None,
+        execution_timeout = None,
         properties = {}):
     dimensions = dict(host["dimensions"])
     dimensions["pool"] = "luci.flex.ci"
@@ -129,6 +133,8 @@ def ci_builder(
         caches += host["caches"]
     properties = dict(properties)
     properties["$gatekeeper"] = {"group": "client.boringssl"}
+    if execution_timeout == None:
+        execution_timeout = host.get("execution_timeout", DEFAULT_TIMEOUT)
     builder = luci.builder(
         name = name,
         bucket = "ci",
@@ -138,7 +144,7 @@ def ci_builder(
         ),
         service_account = "boringssl-ci-builder@chops-service-accounts.iam.gserviceaccount.com",
         dimensions = dimensions,
-        execution_timeout = host.get("execution_timeout", DEFAULT_TIMEOUT),
+        execution_timeout = execution_timeout,
         caches = caches,
         notifies = [notifier],
         triggered_by = [poller],
@@ -252,6 +258,9 @@ WALLEYE_HOST = {
     "execution_timeout": ANDROID_TIMEOUT,
 }
 
+# SDE tests take longer to run.
+SDE_TIMEOUT = 60 * time.minute
+
 # TODO(davidben): Switch the BoringSSL recipe to specify most flags in
 # properties rather than parsing names. Then we can add new configurations
 # without having to touch multiple repositories.
@@ -345,7 +354,13 @@ both_builders("linux", LINUX_HOST, category = "linux", short_name = "dbg")
 both_builders("linux_rel", LINUX_HOST, category = "linux", short_name = "rel")
 both_builders("linux32", LINUX_HOST, category = "linux|32", short_name = "dbg")
 both_builders("linux32_rel", LINUX_HOST, category = "linux|32", short_name = "rel")
-ci_builder("linux32_sde", LINUX_HOST, category = "linux|32", short_name = "sde")
+ci_builder(
+    "linux32_sde",
+    LINUX_HOST,
+    category = "linux|32",
+    short_name = "sde",
+    execution_timeout = SDE_TIMEOUT,
+)
 both_builders(
     "linux32_nosse2_noasm",
     LINUX_HOST,
@@ -416,7 +431,13 @@ both_builders(
     category = "linux",
     short_name = "not",
 )
-ci_builder("linux_sde", LINUX_HOST, category = "linux", short_name = "sde")
+ci_builder(
+    "linux_sde",
+    LINUX_HOST,
+    category = "linux",
+    short_name = "sde",
+    execution_timeout = SDE_TIMEOUT,
+)
 both_builders("linux_shared", LINUX_HOST, category = "linux", short_name = "sh")
 both_builders("linux_small", LINUX_HOST, category = "linux", short_name = "sm")
 both_builders(
@@ -430,7 +451,13 @@ both_builders("mac_rel", MAC_HOST, category = "mac", short_name = "rel")
 both_builders("mac_small", MAC_HOST, category = "mac", short_name = "sm")
 both_builders("win32", WIN_HOST, category = "win|32", short_name = "dbg")
 both_builders("win32_rel", WIN_HOST, category = "win|32", short_name = "rel")
-ci_builder("win32_sde", WIN_HOST, category = "win|32", short_name = "sde")
+ci_builder(
+    "win32_sde",
+    WIN_HOST,
+    category = "win|32",
+    short_name = "sde",
+    execution_timeout = SDE_TIMEOUT,
+)
 both_builders("win32_small", WIN_HOST, category = "win|32", short_name = "sm")
 
 # To reduce cycle times, the CQ VS2017 builders are compile-only.
@@ -457,7 +484,13 @@ both_builders(
 
 both_builders("win64", WIN_HOST, category = "win|64", short_name = "dbg")
 both_builders("win64_rel", WIN_HOST, category = "win|64", short_name = "rel")
-ci_builder("win64_sde", WIN_HOST, category = "win|64", short_name = "sde")
+ci_builder(
+    "win64_sde",
+    WIN_HOST,
+    category = "win|64",
+    short_name = "sde",
+    execution_timeout = SDE_TIMEOUT,
+)
 both_builders("win64_small", WIN_HOST, category = "win|64", short_name = "sm")
 
 # To reduce cycle times, the CQ VS2017 builders are compile-only.
