@@ -92,7 +92,7 @@ luci.cq(
 )
 
 cq_group = luci.cq_group(
-    name = "Main CQ",
+    name = "main-cq",
     watch = cq.refset(REPO_URL, refs = ["refs/heads/.+"]),
     retry_config = cq.RETRY_ALL_FAILURES,
 )
