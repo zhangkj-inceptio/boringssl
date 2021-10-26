@@ -298,6 +298,14 @@ both_builders(
     short_name = "dbg",
     cq_host = LINUX_HOST,
     cq_compile_only = True,
+    properties = {
+        "cmake_args": {
+            # Newer versions of the Android NDK make NEON-only builds by
+            # default. We rely on making NEON-optional builds for some of our
+            # test coverage, but see https://crbug.com/boringssl/454.
+            "ANDROID_ARM_NEON": "FALSE",
+        },
+    },
 )
 both_builders(
     "android_arm_rel",
@@ -307,6 +315,14 @@ both_builders(
     cq_host = LINUX_HOST,
     cq_compile_only = True,
     cq_enabled = False,
+    properties = {
+        "cmake_args": {
+            # Newer versions of the Android NDK make NEON-only builds by
+            # default. We rely on making NEON-optional builds for some of our
+            # test coverage, but see https://crbug.com/boringssl/454.
+            "ANDROID_ARM_NEON": "FALSE",
+        },
+    },
 )
 both_builders(
     "android_arm_armmode_rel",
@@ -316,6 +332,14 @@ both_builders(
     cq_host = LINUX_HOST,
     cq_compile_only = True,
     cq_enabled = False,
+    properties = {
+        "cmake_args": {
+            # Newer versions of the Android NDK make NEON-only builds by
+            # default. We rely on making NEON-optional builds for some of our
+            # test coverage, but see https://crbug.com/boringssl/454.
+            "ANDROID_ARM_NEON": "FALSE",
+        },
+    },
 )
 
 # TODO(davidben): It's strange that the CI runs ARM mode in release mode while
@@ -326,6 +350,12 @@ cq_builder(
     properties = {
         "run_unit_tests": False,
         "run_ssl_tests": False,
+        "cmake_args": {
+            # Newer versions of the Android NDK make NEON-only builds by
+            # default. We rely on making NEON-optional builds for some of our
+            # test coverage, but see https://crbug.com/boringssl/454.
+            "ANDROID_ARM_NEON": "FALSE",
+        },
     },
 )
 
