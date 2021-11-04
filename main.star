@@ -9,12 +9,6 @@ lucicfg.check_version("1.23.0")
 # Enable LUCI Realms support.
 lucicfg.enable_experiment("crbug.com/1085650")
 
-# Launch all builds in "realms-aware mode", crbug.com/1203847.
-luci.builder.defaults.experiments.set({
-    "luci.use_realms": 100,
-    "luci.recipes.use_python3": 100,
-})
-
 lucicfg.config(
     lint_checks = ["default"],
 )
@@ -144,6 +138,7 @@ def ci_builder(
         executable = luci.recipe(
             name = recipe,
             cipd_package = RECIPE_BUNDLE,
+            use_python3 = True,
         ),
         service_account = "boringssl-ci-builder@chops-service-accounts.iam.gserviceaccount.com",
         dimensions = dimensions,
@@ -169,6 +164,7 @@ def cq_builder(name, host, *, recipe = "boringssl", cq_enabled = True, propertie
         executable = luci.recipe(
             name = recipe,
             cipd_package = RECIPE_BUNDLE,
+            use_python3 = True,
         ),
         service_account = "boringssl-try-builder@chops-service-accounts.iam.gserviceaccount.com",
         dimensions = dimensions,
