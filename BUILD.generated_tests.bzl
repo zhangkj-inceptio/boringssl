@@ -1,6 +1,7 @@
 # This file is created by generate_build_files.py. Do not edit manually.
 
 test_support_sources = [
+    "src/crypto/asn1/charmap.h",
     "src/crypto/asn1/internal.h",
     "src/crypto/bio/internal.h",
     "src/crypto/bytestring/internal.h",
@@ -53,11 +54,9 @@ test_support_sources = [
     "src/crypto/test/wycheproof_util.cc",
     "src/crypto/test/wycheproof_util.h",
     "src/crypto/trust_token/internal.h",
-    "src/crypto/x509/charmap.h",
     "src/crypto/x509/internal.h",
     "src/crypto/x509v3/ext_dat.h",
     "src/crypto/x509v3/internal.h",
-    "src/crypto/x509v3/pcy_int.h",
     "src/ssl/internal.h",
     "src/ssl/test/async_bio.h",
     "src/ssl/test/fuzzer.h",
@@ -251,6 +250,13 @@ crypto_test_data = [
     "src/crypto/x509/test/some_names1.pem",
     "src/crypto/x509/test/some_names2.pem",
     "src/crypto/x509/test/some_names3.pem",
+    "src/crypto/x509/test/trailing_data_leaf_authority_key_identifier.pem",
+    "src/crypto/x509/test/trailing_data_leaf_basic_constraints.pem",
+    "src/crypto/x509/test/trailing_data_leaf_ext_key_usage.pem",
+    "src/crypto/x509/test/trailing_data_leaf_key_usage.pem",
+    "src/crypto/x509/test/trailing_data_leaf_name_constraints.pem",
+    "src/crypto/x509/test/trailing_data_leaf_subject_alt_name.pem",
+    "src/crypto/x509/test/trailing_data_leaf_subject_key_identifier.pem",
     "src/third_party/wycheproof_testvectors/aes_cbc_pkcs5_test.txt",
     "src/third_party/wycheproof_testvectors/aes_cmac_test.txt",
     "src/third_party/wycheproof_testvectors/aes_gcm_siv_test.txt",
