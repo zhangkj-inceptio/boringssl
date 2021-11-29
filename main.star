@@ -222,7 +222,7 @@ LINUX_HOST = {
 
 MAC_HOST = {
     "dimensions": {
-        "os": "Mac-10.15",
+        "os": "Mac-10.15|Mac-11",
         "cpu": "x86-64",
     },
     "caches": [swarming.cache("osx_sdk")],
