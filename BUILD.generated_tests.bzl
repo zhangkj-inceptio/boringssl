@@ -140,7 +140,6 @@ crypto_test_sources = [
     "src/crypto/x509/x509_test.cc",
     "src/crypto/x509/x509_time_test.cc",
     "src/crypto/x509v3/tab_test.cc",
-    "src/crypto/x509v3/v3name_test.cc",
 ]
 
 ssl_test_sources = [
