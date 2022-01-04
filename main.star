@@ -220,7 +220,19 @@ LINUX_HOST = {
     },
 }
 
-MAC_HOST = {
+MAC_ARM64_HOST = {
+    "dimensions": {
+        "os": "Mac-11",
+        "cpu": "arm64",
+    },
+    "caches": [swarming.cache("osx_sdk")],
+    # xcode installation can take a while, particularly when running
+    # concurrently on multiple VMs on the same host. See crbug.com/1063870
+    # for more context.
+    "execution_timeout": 60 * time.minute,
+}
+
+MAC_X86_64_HOST = {
     "dimensions": {
         "os": "Mac-10.15|Mac-11",
         "cpu": "x86-64",
@@ -359,9 +371,13 @@ cq_builder(
 )
 
 both_builders("docs", LINUX_HOST, recipe = "boringssl_docs", short_name = "doc")
+
+# For now, we use x86_64 Macs to build iOS because there are far more of them
+# in luci.flex.ci and luci.flex.try pools. When this changes, switch to
+# MAC_ARM64_HOST.
 both_builders(
     "ios_compile",
-    MAC_HOST,
+    MAC_X86_64_HOST,
     category = "ios",
     short_name = "32",
     properties = {
@@ -371,7 +387,7 @@ both_builders(
 )
 both_builders(
     "ios64_compile",
-    MAC_HOST,
+    MAC_X86_64_HOST,
     category = "ios",
     short_name = "64",
     properties = {
@@ -475,9 +491,10 @@ both_builders(
     category = "linux",
     short_name = "nosse2",
 )
-both_builders("mac", MAC_HOST, category = "mac", short_name = "dbg")
-both_builders("mac_rel", MAC_HOST, category = "mac", short_name = "rel")
-both_builders("mac_small", MAC_HOST, category = "mac", short_name = "sm")
+both_builders("mac", MAC_X86_64_HOST, category = "mac", short_name = "dbg")
+both_builders("mac_rel", MAC_X86_64_HOST, category = "mac", short_name = "rel")
+both_builders("mac_small", MAC_X86_64_HOST, category = "mac", short_name = "sm")
+both_builders("mac_arm64", MAC_ARM64_HOST, category = "mac", short_name = "arm64")
 both_builders("win32", WIN_HOST, category = "win|32", short_name = "dbg")
 both_builders("win32_rel", WIN_HOST, category = "win|32", short_name = "rel")
 ci_builder(
