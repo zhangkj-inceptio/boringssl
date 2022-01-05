@@ -68,6 +68,7 @@
     "src/crypto/cipher_extra/tls_cbc.c", 
     "src/crypto/cmac/cmac.c", 
     "src/crypto/conf/conf.c", 
+    "src/crypto/cpu-aarch64-apple.c", 
     "src/crypto/cpu-aarch64-fuchsia.c", 
     "src/crypto/cpu-aarch64-linux.c", 
     "src/crypto/cpu-aarch64-win.c", 
