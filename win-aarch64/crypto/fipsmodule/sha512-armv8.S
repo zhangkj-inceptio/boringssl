@@ -13,7 +13,7 @@
 #if defined(BORINGSSL_PREFIX)
 #include <boringssl_prefix_symbols_asm.h>
 #endif
-// Copyright 2014-2016 The OpenSSL Project Authors. All Rights Reserved.
+// Copyright 2014-2020 The OpenSSL Project Authors. All Rights Reserved.
 //
 // Licensed under the OpenSSL license (the "License").  You may not use
 // this file except in compliance with the License.  You can obtain a copy
@@ -41,6 +41,7 @@
 // Denver	2.01		10.5 (+26%)	6.70 (+8%)
 // X-Gene			20.0 (+100%)	12.8 (+300%(***))
 // Mongoose	2.36		13.0 (+50%)	8.36 (+33%)
+// Kryo		1.92		17.4 (+30%)	11.2 (+8%)
 //
 // (*)	Software SHA256 results are of lesser relevance, presented
 //	mostly for informational purposes.
@@ -49,7 +50,7 @@
 //	on Cortex-A53 (or by 4 cycles per round).
 // (***)	Super-impressive coefficients over gcc-generated code are
 //	indication of some compiler "pathology", most notably code
-//	generated with -mgeneral-regs-only is significanty faster
+//	generated with -mgeneral-regs-only is significantly faster
 //	and the gap is only 40-90%.
 
 #ifndef	__KERNEL__
@@ -92,7 +93,7 @@ Loop:
 	ldr	x19,[x30],#8			// *K++
 	eor	x28,x21,x22				// magic seed
 	str	x1,[x29,#112]
-#ifndef	__ARMEB__
+#ifndef	__AARCH64EB__
 	rev	x3,x3			// 0
 #endif
 	ror	x16,x24,#14
@@ -115,7 +116,7 @@ Loop:
 	add	x27,x27,x28			// h+=Maj(a,b,c)
 	ldr	x28,[x30],#8		// *K++, x19 in next round
 	//add	x27,x27,x17			// h+=Sigma0(a)
-#ifndef	__ARMEB__
+#ifndef	__AARCH64EB__
 	rev	x4,x4			// 1
 #endif
 	ldp	x5,x6,[x1],#2*8
@@ -140,7 +141,7 @@ Loop:
 	add	x26,x26,x19			// h+=Maj(a,b,c)
 	ldr	x19,[x30],#8		// *K++, x28 in next round
 	//add	x26,x26,x17			// h+=Sigma0(a)
-#ifndef	__ARMEB__
+#ifndef	__AARCH64EB__
 	rev	x5,x5			// 2
 #endif
 	add	x26,x26,x17			// h+=Sigma0(a)
@@ -164,7 +165,7 @@ Loop:
 	add	x25,x25,x28			// h+=Maj(a,b,c)
 	ldr	x28,[x30],#8		// *K++, x19 in next round
 	//add	x25,x25,x17			// h+=Sigma0(a)
-#ifndef	__ARMEB__
+#ifndef	__AARCH64EB__
 	rev	x6,x6			// 3
 #endif
 	ldp	x7,x8,[x1],#2*8
@@ -189,7 +190,7 @@ Loop:
 	add	x24,x24,x19			// h+=Maj(a,b,c)
 	ldr	x19,[x30],#8		// *K++, x28 in next round
 	//add	x24,x24,x17			// h+=Sigma0(a)
-#ifndef	__ARMEB__
+#ifndef	__AARCH64EB__
 	rev	x7,x7			// 4
 #endif
 	add	x24,x24,x17			// h+=Sigma0(a)
@@ -213,7 +214,7 @@ Loop:
 	add	x23,x23,x28			// h+=Maj(a,b,c)
 	ldr	x28,[x30],#8		// *K++, x19 in next round
 	//add	x23,x23,x17			// h+=Sigma0(a)
-#ifndef	__ARMEB__
+#ifndef	__AARCH64EB__
 	rev	x8,x8			// 5
 #endif
 	ldp	x9,x10,[x1],#2*8
@@ -238,7 +239,7 @@ Loop:
 	add	x22,x22,x19			// h+=Maj(a,b,c)
 	ldr	x19,[x30],#8		// *K++, x28 in next round
 	//add	x22,x22,x17			// h+=Sigma0(a)
-#ifndef	__ARMEB__
+#ifndef	__AARCH64EB__
 	rev	x9,x9			// 6
 #endif
 	add	x22,x22,x17			// h+=Sigma0(a)
@@ -262,7 +263,7 @@ Loop:
 	add	x21,x21,x28			// h+=Maj(a,b,c)
 	ldr	x28,[x30],#8		// *K++, x19 in next round
 	//add	x21,x21,x17			// h+=Sigma0(a)
-#ifndef	__ARMEB__
+#ifndef	__AARCH64EB__
 	rev	x10,x10			// 7
 #endif
 	ldp	x11,x12,[x1],#2*8
@@ -287,7 +288,7 @@ Loop:
 	add	x20,x20,x19			// h+=Maj(a,b,c)
 	ldr	x19,[x30],#8		// *K++, x28 in next round
 	//add	x20,x20,x17			// h+=Sigma0(a)
-#ifndef	__ARMEB__
+#ifndef	__AARCH64EB__
 	rev	x11,x11			// 8
 #endif
 	add	x20,x20,x17			// h+=Sigma0(a)
@@ -311,7 +312,7 @@ Loop:
 	add	x27,x27,x28			// h+=Maj(a,b,c)
 	ldr	x28,[x30],#8		// *K++, x19 in next round
 	//add	x27,x27,x17			// h+=Sigma0(a)
-#ifndef	__ARMEB__
+#ifndef	__AARCH64EB__
 	rev	x12,x12			// 9
 #endif
 	ldp	x13,x14,[x1],#2*8
@@ -336,7 +337,7 @@ Loop:
 	add	x26,x26,x19			// h+=Maj(a,b,c)
 	ldr	x19,[x30],#8		// *K++, x28 in next round
 	//add	x26,x26,x17			// h+=Sigma0(a)
-#ifndef	__ARMEB__
+#ifndef	__AARCH64EB__
 	rev	x13,x13			// 10
 #endif
 	add	x26,x26,x17			// h+=Sigma0(a)
@@ -360,7 +361,7 @@ Loop:
 	add	x25,x25,x28			// h+=Maj(a,b,c)
 	ldr	x28,[x30],#8		// *K++, x19 in next round
 	//add	x25,x25,x17			// h+=Sigma0(a)
-#ifndef	__ARMEB__
+#ifndef	__AARCH64EB__
 	rev	x14,x14			// 11
 #endif
 	ldp	x15,x0,[x1],#2*8
@@ -386,7 +387,7 @@ Loop:
 	add	x24,x24,x19			// h+=Maj(a,b,c)
 	ldr	x19,[x30],#8		// *K++, x28 in next round
 	//add	x24,x24,x17			// h+=Sigma0(a)
-#ifndef	__ARMEB__
+#ifndef	__AARCH64EB__
 	rev	x15,x15			// 12
 #endif
 	add	x24,x24,x17			// h+=Sigma0(a)
@@ -411,7 +412,7 @@ Loop:
 	add	x23,x23,x28			// h+=Maj(a,b,c)
 	ldr	x28,[x30],#8		// *K++, x19 in next round
 	//add	x23,x23,x17			// h+=Sigma0(a)
-#ifndef	__ARMEB__
+#ifndef	__AARCH64EB__
 	rev	x0,x0			// 13
 #endif
 	ldp	x1,x2,[x1]
@@ -437,7 +438,7 @@ Loop:
 	add	x22,x22,x19			// h+=Maj(a,b,c)
 	ldr	x19,[x30],#8		// *K++, x28 in next round
 	//add	x22,x22,x17			// h+=Sigma0(a)
-#ifndef	__ARMEB__
+#ifndef	__AARCH64EB__
 	rev	x1,x1			// 14
 #endif
 	ldr	x6,[sp,#24]
@@ -463,7 +464,7 @@ Loop:
 	add	x21,x21,x28			// h+=Maj(a,b,c)
 	ldr	x28,[x30],#8		// *K++, x19 in next round
 	//add	x21,x21,x17			// h+=Sigma0(a)
-#ifndef	__ARMEB__
+#ifndef	__AARCH64EB__
 	rev	x2,x2			// 15
 #endif
 	ldr	x7,[sp,#0]
