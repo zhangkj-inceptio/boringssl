@@ -339,11 +339,7 @@ set(
   win-x86_64/crypto/test/trampoline-x86_64.asm
 )
 
-if(APPLE AND ARCH STREQUAL "aarch64")
-  set(CRYPTO_ARCH_SOURCES ${CRYPTO_apple_aarch64_SOURCES})
-elseif(APPLE AND ARCH STREQUAL "arm")
-  set(CRYPTO_ARCH_SOURCES ${CRYPTO_apple_arm_SOURCES})
-elseif(APPLE)
+if(APPLE)
   set(CRYPTO_ARCH_SOURCES ${CRYPTO_apple_${ARCH}_SOURCES})
 elseif(UNIX)
   set(CRYPTO_ARCH_SOURCES ${CRYPTO_linux_${ARCH}_SOURCES})
