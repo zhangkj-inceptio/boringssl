@@ -4,10 +4,10 @@
 lucicfg definitions for BoringSSL's CI and CQ.
 """
 
-lucicfg.check_version("1.23.0")
+lucicfg.check_version("1.30.9")
 
-# Enable LUCI Realms support.
-lucicfg.enable_experiment("crbug.com/1085650")
+# Use LUCI Scheduler BBv2 names and add Scheduler realms configs.
+lucicfg.enable_experiment("crbug.com/1182002")
 
 lucicfg.config(
     lint_checks = ["default"],
