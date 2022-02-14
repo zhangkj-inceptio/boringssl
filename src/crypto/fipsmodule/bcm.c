@@ -58,8 +58,6 @@
 #include "cipher/aead.c"
 #include "cipher/cipher.c"
 #include "cipher/e_aes.c"
-#include "cipher/e_des.c"
-#include "des/des.c"
 #include "dh/check.c"
 #include "dh/dh.c"
 #include "digest/digest.c"
@@ -192,7 +190,6 @@ BORINGSSL_bcm_power_on_self_test(void) {
 #endif
 
   assert_within(rodata_start, kPrimes, rodata_end);
-  assert_within(rodata_start, des_skb, rodata_end);
   assert_within(rodata_start, kP256Params, rodata_end);
   assert_within(rodata_start, kPKCS1SigPrefixes, rodata_end);
 
@@ -242,15 +239,11 @@ BORINGSSL_bcm_power_on_self_test(void) {
   }
 
   OPENSSL_cleanse(result, sizeof(result)); // FIPS 140-3, AS05.10.
+#endif  // OPENSSL_ASAN
 
-  if (!boringssl_fips_self_test(BORINGSSL_bcm_text_hash, sizeof(result))) {
-    goto err;
-  }
-#else
   if (!BORINGSSL_self_test()) {
     goto err;
   }
-#endif  // OPENSSL_ASAN
 
   return;
 
