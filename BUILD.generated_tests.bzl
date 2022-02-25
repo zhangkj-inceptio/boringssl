@@ -22,6 +22,7 @@ test_support_sources = [
     "src/crypto/fipsmodule/bn/rsaz_exp.h",
     "src/crypto/fipsmodule/cipher/internal.h",
     "src/crypto/fipsmodule/delocate.h",
+    "src/crypto/fipsmodule/dh/internal.h",
     "src/crypto/fipsmodule/digest/internal.h",
     "src/crypto/fipsmodule/digest/md32_common.h",
     "src/crypto/fipsmodule/ec/internal.h",
