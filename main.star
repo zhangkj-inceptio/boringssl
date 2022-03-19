@@ -506,26 +506,22 @@ ci_builder(
 )
 both_builders("win32_small", WIN_HOST, category = "win|32", short_name = "sm")
 
-# To reduce cycle times, the CQ VS2017 builders are compile-only.
 both_builders(
-    "win32_vs2017",
+    "win32_vs2019",
     WIN_HOST,
-    category = "win|32|vs 2017",
-    short_name = "dbg",
-    cq_compile_only = True,
+    category = "win|32",
+    short_name = "vs2019",
+    cq_compile_only = True,  # Reduce CQ cycle times.
     properties = {
-        "gclient_vars": {"vs_version": "2017"},
+        "gclient_vars": {"vs_version": "2019"},
     },
 )
 both_builders(
-    "win32_vs2017_clang",
+    "win32_clang",
     WIN_HOST,
-    category = "win|32|vs 2017",
-    short_name = "clg",
-    cq_compile_only = True,
-    properties = {
-        "gclient_vars": {"vs_version": "2017"},
-    },
+    category = "win|32",
+    short_name = "clang",
+    cq_compile_only = True,  # Reduce CQ cycle times.
 )
 
 both_builders("win64", WIN_HOST, category = "win|64", short_name = "dbg")
@@ -539,26 +535,22 @@ ci_builder(
 )
 both_builders("win64_small", WIN_HOST, category = "win|64", short_name = "sm")
 
-# To reduce cycle times, the CQ VS2017 builders are compile-only.
 both_builders(
-    "win64_vs2017",
+    "win64_vs2019",
     WIN_HOST,
-    category = "win|64|vs 2017",
-    short_name = "dbg",
-    cq_compile_only = True,
+    category = "win|64",
+    short_name = "vs2019",
+    cq_compile_only = True,  # Reduce CQ cycle times.
     properties = {
-        "gclient_vars": {"vs_version": "2017"},
+        "gclient_vars": {"vs_version": "2019"},
     },
 )
 both_builders(
-    "win64_vs2017_clang",
+    "win64_clang",
     WIN_HOST,
-    category = "win|64|vs 2017",
+    category = "win|64",
     short_name = "clg",
-    cq_compile_only = True,
-    properties = {
-        "gclient_vars": {"vs_version": "2017"},
-    },
+    cq_compile_only = True,  # Reduce CQ cycle times.
 )
 
 both_builders(
@@ -578,7 +570,6 @@ both_builders(
         },
         "gclient_vars": {
             "checkout_nasm": False,
-            "vs_version": "2017",
         },
         "msvc_target": "arm64",
         "run_unit_tests": False,
