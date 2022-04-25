@@ -522,6 +522,7 @@ tool_headers = [
 
 crypto_sources_apple_aarch64 = [
     "apple-aarch64/crypto/chacha/chacha-armv8.S",
+    "apple-aarch64/crypto/cipher_extra/chacha20_poly1305_armv8.S",
     "apple-aarch64/crypto/fipsmodule/aesv8-armx64.S",
     "apple-aarch64/crypto/fipsmodule/armv8-mont.S",
     "apple-aarch64/crypto/fipsmodule/ghash-neon-armv8.S",
@@ -589,6 +590,7 @@ crypto_sources_apple_x86_64 = [
 
 crypto_sources_linux_aarch64 = [
     "linux-aarch64/crypto/chacha/chacha-armv8.S",
+    "linux-aarch64/crypto/cipher_extra/chacha20_poly1305_armv8.S",
     "linux-aarch64/crypto/fipsmodule/aesv8-armx64.S",
     "linux-aarch64/crypto/fipsmodule/armv8-mont.S",
     "linux-aarch64/crypto/fipsmodule/ghash-neon-armv8.S",
@@ -665,6 +667,7 @@ crypto_sources_linux_x86_64 = [
 
 crypto_sources_win_aarch64 = [
     "win-aarch64/crypto/chacha/chacha-armv8.S",
+    "win-aarch64/crypto/cipher_extra/chacha20_poly1305_armv8.S",
     "win-aarch64/crypto/fipsmodule/aesv8-armx64.S",
     "win-aarch64/crypto/fipsmodule/armv8-mont.S",
     "win-aarch64/crypto/fipsmodule/ghash-neon-armv8.S",

@@ -129,6 +129,7 @@ set(
   CRYPTO_apple_aarch64_SOURCES
 
   apple-aarch64/crypto/chacha/chacha-armv8.S
+  apple-aarch64/crypto/cipher_extra/chacha20_poly1305_armv8.S
   apple-aarch64/crypto/fipsmodule/aesv8-armx64.S
   apple-aarch64/crypto/fipsmodule/armv8-mont.S
   apple-aarch64/crypto/fipsmodule/ghash-neon-armv8.S
@@ -204,6 +205,7 @@ set(
   CRYPTO_linux_aarch64_SOURCES
 
   linux-aarch64/crypto/chacha/chacha-armv8.S
+  linux-aarch64/crypto/cipher_extra/chacha20_poly1305_armv8.S
   linux-aarch64/crypto/fipsmodule/aesv8-armx64.S
   linux-aarch64/crypto/fipsmodule/armv8-mont.S
   linux-aarch64/crypto/fipsmodule/ghash-neon-armv8.S
@@ -290,6 +292,7 @@ set(
   CRYPTO_win_aarch64_SOURCES
 
   win-aarch64/crypto/chacha/chacha-armv8.S
+  win-aarch64/crypto/cipher_extra/chacha20_poly1305_armv8.S
   win-aarch64/crypto/fipsmodule/aesv8-armx64.S
   win-aarch64/crypto/fipsmodule/armv8-mont.S
   win-aarch64/crypto/fipsmodule/ghash-neon-armv8.S
