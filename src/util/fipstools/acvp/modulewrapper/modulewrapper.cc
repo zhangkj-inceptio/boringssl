@@ -367,20 +367,6 @@ static bool GetConfig(const Span<const uint8_t> args[], ReplyCallback write_repl
         "aadLen": [{"min": 0, "max": 1024, "increment": 8}]
       },
       {
-        "algorithm": "ACVP-TDES-ECB",
-        "revision": "1.0",
-        "direction": ["encrypt", "decrypt"],
-        "keyLen": [192],
-        "keyingOption": [1]
-      },
-      {
-        "algorithm": "ACVP-TDES-CBC",
-        "revision": "1.0",
-        "direction": ["encrypt", "decrypt"],
-        "keyLen": [192],
-        "keyingOption": [1]
-      },
-      {
         "algorithm": "HMAC-SHA-1",
         "revision": "1.0",
         "keyLen": [{
@@ -709,6 +695,24 @@ static bool GetConfig(const Span<const uint8_t> args[], ReplyCallback write_repl
               "hashAlg": "SHA2-512"
             }, {
               "hashAlg": "SHA-1"
+            }]
+          }]
+        },{
+          "sigType": "pss",
+          "properties": [{
+            "modulo": 1024,
+            "hashPair": [{
+              "hashAlg": "SHA2-224",
+              "saltLen": 28
+            }, {
+              "hashAlg": "SHA2-256",
+              "saltLen": 32
+            }, {
+              "hashAlg": "SHA2-384",
+              "saltLen": 48
+            }, {
+              "hashAlg": "SHA-1",
+              "saltLen": 20
             }]
           }]
         },{
