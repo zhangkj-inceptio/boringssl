@@ -413,7 +413,6 @@ add_library(
   src/crypto/chacha/chacha.c
   src/crypto/cipher_extra/cipher_extra.c
   src/crypto/cipher_extra/derive_key.c
-  src/crypto/cipher_extra/e_aesccm.c
   src/crypto/cipher_extra/e_aesctrhmac.c
   src/crypto/cipher_extra/e_aesgcmsiv.c
   src/crypto/cipher_extra/e_chacha20poly1305.c
@@ -423,7 +422,6 @@ add_library(
   src/crypto/cipher_extra/e_rc4.c
   src/crypto/cipher_extra/e_tls.c
   src/crypto/cipher_extra/tls_cbc.c
-  src/crypto/cmac/cmac.c
   src/crypto/conf/conf.c
   src/crypto/cpu_aarch64_apple.c
   src/crypto/cpu_aarch64_fuchsia.c
