@@ -209,7 +209,6 @@ crypto_headers = [
 ]
 
 crypto_internal_headers = [
-    "src/crypto/asn1/charmap.h",
     "src/crypto/asn1/internal.h",
     "src/crypto/bio/internal.h",
     "src/crypto/bytestring/internal.h",
