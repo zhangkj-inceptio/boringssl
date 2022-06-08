@@ -455,6 +455,7 @@ add_library(
   src/crypto/evp/p_ec_asn1.c
   src/crypto/evp/p_ed25519.c
   src/crypto/evp/p_ed25519_asn1.c
+  src/crypto/evp/p_hkdf.c
   src/crypto/evp/p_rsa.c
   src/crypto/evp/p_rsa_asn1.c
   src/crypto/evp/p_x25519.c
