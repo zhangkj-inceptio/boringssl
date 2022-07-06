@@ -158,6 +158,7 @@ crypto_test_data = [
     "src/crypto/cipher_extra/test/aes_128_cbc_sha1_tls_tests.txt",
     "src/crypto/cipher_extra/test/aes_128_ccm_bluetooth_8_tests.txt",
     "src/crypto/cipher_extra/test/aes_128_ccm_bluetooth_tests.txt",
+    "src/crypto/cipher_extra/test/aes_128_ccm_matter_tests.txt",
     "src/crypto/cipher_extra/test/aes_128_ctr_hmac_sha256.txt",
     "src/crypto/cipher_extra/test/aes_128_gcm_randnonce_tests.txt",
     "src/crypto/cipher_extra/test/aes_128_gcm_siv_tests.txt",
