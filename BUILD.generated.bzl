@@ -468,7 +468,6 @@ crypto_sources = [
     "src/crypto/x509/x_x509a.c",
     "src/crypto/x509v3/pcy_cache.c",
     "src/crypto/x509v3/pcy_data.c",
-    "src/crypto/x509v3/pcy_lib.c",
     "src/crypto/x509v3/pcy_map.c",
     "src/crypto/x509v3/pcy_node.c",
     "src/crypto/x509v3/pcy_tree.c",
