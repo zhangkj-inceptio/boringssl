@@ -186,8 +186,7 @@ def both_builders(
         category = None,
         short_name = None,
         cq_enabled = True,
-        cq_compile_only = False,
-        cq_host = None,
+        cq_compile_only = None,
         properties = {}):
     ci_builder(
         name,
@@ -197,21 +196,30 @@ def both_builders(
         short_name = short_name,
         properties = properties,
     )
-    cq_name = name
-    cq_properties = dict(properties)
-    if cq_compile_only:
-        cq_name += "_compile"
-        cq_properties["run_unit_tests"] = False
-        cq_properties["run_ssl_tests"] = False
-    if cq_host == None:
-        cq_host = host
+
+    # If cq_compile_only is specified, we generate both a disabled builder that
+    # matches the CI builder, and a compile-only builder. The compile-only
+    # builder is controlled by cq_enabled. cq_compile_only also specifies the
+    # host to run on, because the compile-only builder usually has weaker
+    # requirements.
     cq_builder(
-        cq_name,
-        cq_host,
+        name,
+        host,
         recipe = recipe,
-        cq_enabled = cq_enabled,
-        properties = cq_properties,
+        cq_enabled = cq_enabled and not cq_compile_only,
+        properties = properties,
     )
+    if cq_compile_only:
+        compile_properties = dict(properties)
+        compile_properties["run_unit_tests"] = False
+        compile_properties["run_ssl_tests"] = False
+        cq_builder(
+            name + "_compile",
+            cq_compile_only,
+            recipe = recipe,
+            cq_enabled = cq_enabled,
+            properties = compile_properties,
+        )
 
 LINUX_HOST = {
     "dimensions": {
@@ -281,16 +289,14 @@ both_builders(
     BULLHEAD_HOST,
     category = "android|aarch64",
     short_name = "dbg",
-    cq_host = LINUX_HOST,
-    cq_compile_only = True,
+    cq_compile_only = LINUX_HOST,
 )
 both_builders(
     "android_aarch64_rel",
     BULLHEAD_HOST,
     category = "android|aarch64",
     short_name = "rel",
-    cq_host = LINUX_HOST,
-    cq_compile_only = True,
+    cq_compile_only = LINUX_HOST,
     cq_enabled = False,
 )
 both_builders(
@@ -299,16 +305,14 @@ both_builders(
     WALLEYE_HOST,
     category = "android|aarch64",
     short_name = "fips",
-    cq_host = LINUX_HOST,
-    cq_compile_only = True,
+    cq_compile_only = LINUX_HOST,
 )
 both_builders(
     "android_arm",
     BULLHEAD_HOST,
     category = "android|thumb",
     short_name = "dbg",
-    cq_host = LINUX_HOST,
-    cq_compile_only = True,
+    cq_compile_only = LINUX_HOST,
     properties = {
         "cmake_args": {
             # Newer versions of the Android NDK make NEON-only builds by
@@ -323,8 +327,7 @@ both_builders(
     BULLHEAD_HOST,
     category = "android|thumb",
     short_name = "rel",
-    cq_host = LINUX_HOST,
-    cq_compile_only = True,
+    cq_compile_only = LINUX_HOST,
     cq_enabled = False,
     properties = {
         "cmake_args": {
@@ -340,8 +343,7 @@ both_builders(
     BULLHEAD_HOST,
     category = "android|arm",
     short_name = "rel",
-    cq_host = LINUX_HOST,
-    cq_compile_only = True,
+    cq_compile_only = LINUX_HOST,
     cq_enabled = False,
     properties = {
         "cmake_args": {
@@ -511,7 +513,7 @@ both_builders(
     WIN_HOST,
     category = "win|32",
     short_name = "vs2019",
-    cq_compile_only = True,  # Reduce CQ cycle times.
+    cq_compile_only = WIN_HOST,  # Reduce CQ cycle times.
     properties = {
         "gclient_vars": {"vs_version": "2019"},
     },
@@ -521,7 +523,7 @@ both_builders(
     WIN_HOST,
     category = "win|32",
     short_name = "clang",
-    cq_compile_only = True,  # Reduce CQ cycle times.
+    cq_compile_only = WIN_HOST,  # Reduce CQ cycle times.
 )
 
 both_builders("win64", WIN_HOST, category = "win|64", short_name = "dbg")
@@ -540,7 +542,7 @@ both_builders(
     WIN_HOST,
     category = "win|64",
     short_name = "vs2019",
-    cq_compile_only = True,  # Reduce CQ cycle times.
+    cq_compile_only = WIN_HOST,  # Reduce CQ cycle times.
     properties = {
         "gclient_vars": {"vs_version": "2019"},
     },
@@ -550,7 +552,7 @@ both_builders(
     WIN_HOST,
     category = "win|64",
     short_name = "clg",
-    cq_compile_only = True,  # Reduce CQ cycle times.
+    cq_compile_only = WIN_HOST,  # Reduce CQ cycle times.
 )
 
 both_builders(
