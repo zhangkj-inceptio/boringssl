@@ -285,7 +285,6 @@ crypto_sources = [
     "src/crypto/asn1/a_time.c",
     "src/crypto/asn1/a_type.c",
     "src/crypto/asn1/a_utctm.c",
-    "src/crypto/asn1/a_utf8.c",
     "src/crypto/asn1/asn1_lib.c",
     "src/crypto/asn1/asn1_par.c",
     "src/crypto/asn1/asn_pack.c",
