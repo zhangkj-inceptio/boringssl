@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# Copyright 2017-2021 NXP
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+
+BIN_FW="fm_ucode qe_ucode phy_cortina phy_inphi pfe_bin ddr_phy_bin dp_firmware_cadence"
+
+LS_MACHINE_LIST=`grep CONFIG_MACHINE_L $FBDIR/configs/$CONFIGLIST |grep y|cut -b 16-|tr A-Z a-z|cut -d= -f1|tr "\n" " "`
+
+IMX_MACHINE_LIST=`grep CONFIG_MACHINE_IMX $FBDIR/configs/$CONFIGLIST |grep y|cut -b 16-|tr A-Z a-z|cut -d= -f1|tr "\n" " "`
+
+FIRMWARE_REPO_LIST=`grep CONFIG_FW_ $FBDIR/configs/$CONFIGLIST |grep y|cut -b 11-|tr A-Z a-z|cut -d= -f1|tr "\n" " "`
+
+FIRMWARE_REPO_LIST="$FIRMWARE_REPO_LIST $BIN_FW"
+
+LINUX_ALL_LIST=`grep CONFIG_KERL_ $FBDIR/configs/$CONFIGLIST |cut -b 13-|tr A-Z a-z|cut -d= -f1|tr "\n" " "`
+
+LINUX_REPO_LIST=`grep CONFIG_KERL_ $FBDIR/configs/$CONFIGLIST |grep y|cut -b 13-|tr A-Z a-z|cut -d= -f1|tr "\n" " "`
+
+APPS_ALL_LIST=`grep CONFIG_APP_ $FBDIR/configs/$CONFIGLIST |cut -b 12-|tr A-Z a-z|cut -d= -f1|tr "\n" " "`
+APPS_ALL_LIST=`echo $APPS_ALL_LIST | sed -e 's/optee/optee optee_os optee_client optee_test/'`
+
+APPS_REPO_LIST=`grep CONFIG_APP_ $FBDIR/configs/$CONFIGLIST |grep y|cut -b 12-|tr A-Z a-z|cut -d= -f1|tr "\n" " "`
+APPS_REPO_LIST=`echo $APPS_REPO_LIST | sed -e 's/optee/optee_os optee_client optee_test/'`
+
+EIQ_ALL_LIST=`grep CONFIG_EIQ_ $FBDIR/configs/$CONFIGLIST |cut -b 12-|tr A-Z a-z|cut -d= -f1|tr "\n" " "`
+
+EIQ_REPO_LIST=`grep CONFIG_EIQ_ $FBDIR/configs/$CONFIGLIST |grep y|cut -b 12-|tr A-Z a-z|cut -d= -f1|tr "\n" " "`
+
+NETWORKING_REPO_LIST=`find $FBDIR/packages/apps/networking -name '*.mk' | xargs basename -s .mk | tr '\n' ' '`
+
+GRAPHICS_REPO_LIST=`find $FBDIR/packages/apps/graphics -name '*.mk' | xargs basename -s .mk | tr '\n' ' '`
+
+MULTIMEDIA_REPO_LIST=`find $FBDIR/packages/apps/multimedia -name '*.mk' | xargs basename -s .mk | tr '\n' ' '`
+
+SECURITY_REPO_LIST=`find $FBDIR/packages/apps/security -name '*.mk' | xargs basename -s .mk | tr '\n' ' '`
+SECURITY_REPO_LIST=`echo $SECURITY_REPO_LIST | sed -e 's/optee/optee_os optee_client optee_test/'`
+
+GENERIC_REPO_LIST=`find $FBDIR/packages/apps/generic -name '*.mk' | xargs basename -s .mk | tr '\n' ' '`
+
+
+export LS_MACHINE_LIST IMX_MACHINE_LIST FIRMWARE_REPO_LIST FIRMWARE_REPO_LIST LINUX_ALL_LIST LINUX_REPO_LIST \
+       APPS_ALL_LIST APPS_REPO_LIST EIQ_ALL_LIST EIQ_REPO_LIST NETWORKING_REPO_LIST GRAPHICS_REPO_LIST \
+       MULTIMEDIA_REPO_LIST SECURITY_REPO_LIST GENERIC_REPO_LIST

@@ -1,0 +1,68 @@
+#!/bin/bash
+
+# Copyright 2017-2021 NXP
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+
+
+build_distro_rfs_ubuntu() {
+    if [ $DISTROTYPE = ubuntu -o $DISTROTYPE = debian ] && [ -f $RFSDIR/etc/buildinfo ]; then
+	echo $RFSDIR already exists! && exit 0
+    fi
+    if [ $DISTROTYPE = ubuntu -o $DISTROTYPE = debian ] && [ ! -f $RFSDIR/etc/buildinfo ]; then
+	echo generating $RFSDIR ...
+	test -c $RFSDIR/dev/pts/ptmx && sudo umount $RFSDIR/dev/pts
+	test -f $RFSDIR/proc/uptime && sudo umount $RFSDIR/proc
+	[ -n "$RFSDIR" ] && sudo rm -rf $RFSDIR/*
+    fi
+    [ -n "$BUILDARG" ] && pkglist=$BUILDARG || pkglist=extra_packages_list
+    mkdir -p $RFSDIR
+
+    if [ "$FETCH_PREBUILT_LSDK_RFS" = y -a "$FORCE" != y ] && [ $DISTROTYPE = ubuntu ]; then
+       rootfsn=rootfs_${DISTRIB_VERSION}_${DISTROTYPE}_${DISTROSCALE}_${DESTARCH}.tgz
+       rootfs_url=$DISTRO_SVR_URL/$DISTRIB_VERSION/$rootfsn
+       if [ ! -f $FBOUTDIR/images/$rootfsn ]; then
+	   fbprint_n "Downloading $rootfs_url ..." && cd $FBOUTDIR/images
+	   wget --progress=bar:force $rootfs_url || true
+       fi
+       [ -f $FBOUTDIR/images/$rootfsn ] && echo Extracting $rootfsn && \
+       sudo tar xf $FBOUTDIR/images/$rootfsn -C $RFSDIR || echo Building $RFSDIR from scratch
+       cd $FBDIR
+    fi
+
+    if [ $DISTROSCALE = lite -a $DISTROTYPE = ubuntu ]; then
+	. $FBDIR/configs/ubuntu/base.cfg
+	rfsname=`eval echo '${'"ubuntu_base_""$DESTARCH"'}'`
+	if [ -f $FBOUTDIR/rfs/$rfsname ]; then
+	    echo $FBOUTDIR/rfs/$rfsname exist already
+	else
+	    wget --progress=bar:force $ubuntu_base_url/$rfsname -O $FBOUTDIR/rfs/$rfsname
+	    [ $? != 0 ] && fbprint_e "Failed to download $ubuntu_base_url/$rfsname" && exit
+	fi
+	if [ -f $FBOUTDIR/rfs/$rfsname ]; then
+	    sha256sum_expected=`eval echo '${'"sha256sum_""$DESTARCH"'}'`
+	    sha256sum_current=`sha256sum $FBOUTDIR/rfs/$rfsname | cut -d' ' -f1`
+	    if [ $sha256sum_expected = $sha256sum_current ]; then
+		echo Extracting $rfsname ...
+		sudo tar xf $FBOUTDIR/rfs/$rfsname -C $RFSDIR
+	    else
+		fbprint_e "sha256sum of downloaded image is unmatched $sha256sum_current != $sha256sum_expected"
+		rm -f $FBOUTDIR/rfs/$rfsname && exit
+	    fi
+	fi
+	flex-mkdistrorfs $SYSARCH $CODENAME $DISTROSCALE $pkglist && \
+	flex-builder -i merge-component -r ubuntu:lite -a $DESTARCH -f $CFGLISTYML && \
+	flex-builder -i mkcpio -r ubuntu:lite -a $DESTARCH -f $CFGLISTYML && \
+	flex-builder -i packrfs -r ubuntu:lite -a $DESTARCH -f $CFGLISTYML
+    elif [ ! -f $RFSDIR/etc/buildinfo ]; then
+	flex-mkdistrorfs $SYSARCH $CODENAME $DISTROSCALE $pkglist
+    fi
+
+    if [ -d $RFSDIR/etc/udev/rules.d ]; then
+	sudo cp -f $FBDIR/packages/rfs/misc/udev/udev-rules-qoriq/72-fsl-dpaa-persistent-networking.rules $RFSDIR/etc/udev/rules.d
+	sudo cp -f $FBDIR/packages/rfs/misc/udev/udev-rules-qoriq/73-fsl-enetc-networking.rules $RFSDIR/etc/udev/rules.d
+	sudo cp -f $FBDIR/packages/rfs/misc/udev/udev-rules-imx/10-imx.rules $RFSDIR/etc/udev/rules.d
+    fi
+    fbprint_d $RFSDIR
+}

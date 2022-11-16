@@ -1,0 +1,181 @@
+#
+# Copyright 2019-2021 NXP
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+
+git_repo_update() {
+    if [ -n "$COMPONENT" ]; then
+	check_component_valid $COMPONENT
+	reponame=`echo $COMPONENT | sed 's/-/_/'`
+	branch=$(eval echo '$'"repo_"$reponame"_branch")
+	commit=$(eval echo '$'"repo_"$reponame"_commit")
+	repourl=$(eval echo '$'"repo_"$reponame"_url")
+	tag=$(eval echo '$'"repo_"$reponame"_tag")
+    fi
+
+    [ "$CONFIG_EIQ" = y ] && eiqdir=apps/eiq
+    pkgdirlist="firmware linux apps/generic apps/networking apps/graphics apps/multimedia apps/security $eiqdir"
+    for pdn in $pkgdirlist; do
+	if echo $pdn | grep -q / ; then insubdir=y; fi
+	[ "$insubdir" = y ] && subprefix=$(echo $pdn | cut -d/ -f2)_
+	if [ $1 = fetch ]; then
+	    if [ -n "$COMPONENT" ]; then
+		export NOBUILD=y
+		pkgdn=`echo $pdn | tr a-z A-Z`
+		[ ${pdn:0:4} = apps ] && repolist=$APPS_ALL_LIST || \
+		repolist=`eval echo '${'"$pkgdn"'_REPO_LIST}'`
+		if ! echo $repolist | grep -q $COMPONENT; then continue; fi
+		if [ "$insubdir" = y ]; then
+		    repolist=$(ls $FBDIR/packages/$pdn/*.mk | xargs basename -s .mk |  tr '\n' ' ')
+		else
+		    repolist="$(grep 'REPO_LIST =' $FBDIR/packages/$pdn/Makefile | cut -d= -f2)"
+		fi
+		if ! echo $repolist | grep -q $COMPONENT; then continue; fi
+		if [ -n "$tag" ]; then
+		    git_repo_checkout $PACKAGES_PATH/$pdn $COMPONENT tag $tag $repourl
+		elif [ -n "$commit" ]; then
+		    git_repo_checkout $PACKAGES_PATH/$pdn $COMPONENT commit $commit $repourl
+		elif [ -n "$branch" ]; then
+		    git_repo_checkout $PACKAGES_PATH/$pdn $COMPONENT branch $branch $repourl
+		fi
+		fbprint_n "$COMPONENT in $PACKAGES_PATH/$pdn"
+		break
+	    else
+		[ "$insubdir" = y ] && make -C $FBDIR/packages/apps ${subprefix}repo_fetch || \
+		make -C $FBDIR/packages/$pdn ${subprefix}repo_fetch
+	    fi
+	elif [ $1 = latest ]; then
+	    if [ -n "$COMPONENT" -a -z "$branch" -a -n "$commit" ]; then
+		echo commit = $commit; break;
+	    elif [ -n "$COMPONENT" -a -z "$branch" ]; then
+		echo branch of $reponame repo is not specified in $CONFIGLIST!; exit
+	    elif [ -n "$COMPONENT" -a -n "$branch" ] && [ -d $PACKAGES_PATH/$pdn/$reponame ]; then
+		cd $PACKAGES_PATH/$pdn/$reponame && git pull origin $branch && git fetch --tags && cd -
+	    elif [ -n "$COMPONENT" ] && [ ! -d $PACKAGES_PATH/$pdn/$reponame ]; then
+		continue
+	    else
+		[ "$insubdir" = y ] && make -C $FBDIR/packages/apps ${subprefix}repo_update_latest || \
+		make -C $FBDIR/packages/$pdn ${subprefix}repo_update_latest
+	    fi
+	elif [ $1 = commit ]; then
+	    if [ -n "$COMPONENT" -a -z "$commit" ]; then
+		echo commit of $COMPONENT repo is not specified in $CONFIGLIST!; exit
+	    elif [ -n "$COMPONENT" ] && [ ! -d $PACKAGES_PATH/$pdn/$COMPONENT ]; then
+		continue;
+	    elif [ -n "$COMPONENT" -a -n "$commit" ] && [ -d $PACKAGES_PATH/$pdn/$COMPONENT ]; then
+		git_repo_checkout $PACKAGES_PATH/$pdn $COMPONENT commit $commit
+	    else
+		[ "$insubdir" = y ] && make -C $FBDIR/packages/apps ${subprefix}repo_update_commit || \
+		make -C $FBDIR/packages/$pdn ${subprefix}repo_update_commit
+	    fi
+	elif [ $1 = tag ]; then
+	    if [ -n "$COMPONENT" -a -z "$tag" ]; then
+		echo tag of $COMPONENT repo is not specified in $CONFIGLIST; exit
+	    elif [ -n "$COMPONENT" ] && [ ! -d $PACKAGES_PATH/$pdn/$COMPONENT ]; then
+		continue;
+	    elif [ -n "$COMPONENT" -a -n "$tag" ] && [ -d $PACKAGES_PATH/$pdn/$COMPONENT ]; then
+		git_repo_checkout $PACKAGES_PATH/$pdn $COMPONENT tag $tag
+	    else
+		[ "$insubdir" = y ] && make -C $FBDIR/packages/apps ${subprefix}repo_update_tag || \
+		make -C $FBDIR/packages/$pdn ${subprefix}repo_update_tag
+	    fi
+	elif [ $1 = branch ]; then
+	    if [ -n "$COMPONENT" -a -z "$branch" ]; then
+		echo branch of $COMPONENT repo is not specified in $CONFIGLIST!; exit
+	    elif [ -n "$COMPONENT" -a -n "$branch" ] && [ -d $PACKAGES_PATH/$pdn/$COMPONENT ]; then
+		git_repo_checkout $PACKAGES_PATH/$pdn $COMPONENT branch $branch
+	    elif [ -n "$COMPONENT" ] && [ ! -d $PACKAGES_PATH/$pdn/$COMPONENT ]; then
+		continue;
+	    else
+		[ "$insubdir" = y ] && make -C $FBDIR/packages/apps ${subprefix}repo_update_branch || \
+		make -C $FBDIR/packages/$pdn ${subprefix}repo_update_branch
+	    fi
+	fi
+    done
+}
+
+
+
+git_repo_checkout() {
+    # $1:pkgdir, $2:gittree, $3:type of branch/tag/commit
+    # $4:name of branch/tag/commit, $5:repo_url
+    cd $1
+    repourl=`eval echo '${'"repo_""$2""_url"'}'`
+    [ -z "$repourl" ] && return
+
+    if [ $2 = linux ]; then
+	tree=$KERNEL_TREE
+    elif [ $2 = uboot -a $SOCFAMILY = LS ]; then
+	tree=$UBOOT_TREE
+    elif [ $2 = rcw ]; then
+	tree=$RCW_TREE
+    else
+	tree=$2
+    fi
+
+    if [ ! -d $tree ]; then
+	if [ $3 = branch ]; then
+	    [ -n "$5" ] && git clone $5 $tree -b $4 || git clone $repourl -b $4
+	elif [ $3 = tag -o $3 = commit ]; then
+	    if [ -n "$5" ]; then
+		git clone $5 $tree && cd $tree && git checkout $4 -b $4
+	    else
+		git clone $repourl $tree && cd $tree && git checkout $4 -b $4
+	    fi
+	fi
+    else
+	cd $tree
+	if ! git show-ref --verify --quiet refs/heads/$4; then
+	    if [ $3 = branch ]; then
+		git checkout remotes/origin/$4 -b $4
+	    elif [ $3 = tag -o $3 = commit ]; then
+		git checkout $4 -b $4
+	    fi
+	else
+	    git checkout $4
+	fi
+    fi
+    cd $FBDIR
+}
+
+
+
+repo_version() {
+    # to automatically support different branch/tag/commit versions of repo
+    # $1: repo name
+    # $2: machine name or 'second'
+    if [ -n "$2" ] && [ "$2" = "$MACHINE" -o "$2" = "${MACHINE:0:5}" -o "$2" = "${MACHINE:0:7}" -o "$2" = second ]; then
+	repo_tag=$(eval echo '$'second_repo_"$1"_tag)
+	repo_branch=$(eval echo '$'second_repo_"$1"_branch)
+	repo_commit=$(eval echo '$'second_repo_"$1"_commit)
+    else
+	repo_tag=$(eval echo '$'repo_"$1"_tag)
+	repo_branch=$(eval echo '$'repo_"$1"_branch)
+	repo_commit=$(eval echo '$'repo_"$1"_commit)
+    fi
+
+    if [ "$UPDATE_REPO_PER_TAG" = y -a -n "$repo_tag" ] && [ "`cat .git/HEAD | cut -d/ -f3`" != "$repo_tag" ]; then
+	echo swithing to $repo_tag ...
+	if git show-ref --verify --quiet refs/heads/$repo_tag; then
+	    git checkout $repo_tag
+	else
+	    git checkout $repo_tag -b $repo_tag
+	fi
+    elif [ "$UPDATE_REPO_PER_COMMIT" = "y" -a -n "$repo_commit" ] && \
+	 [ "`cat .git/HEAD | cut -d/ -f3`" != "$repo_commit" ]; then
+	echo swithing to commit $repo_commit ...
+	if git show-ref --verify --quiet refs/heads/$repo_commit; then
+	    git checkout $repo_commit
+	else
+	    git checkout $repo_commit -b $repo_commit
+	fi
+    elif [ "$UPDATE_REPO_PER_BRANCH" = y -a -n "$repo_branch" ] && [ "`cat .git/HEAD | cut -d/ -f3`" != "$repo_branch" ]; then
+	echo swithing to $repo_branch ...
+	if git show-ref --verify --quiet refs/heads/$repo_branch; then
+	    git checkout $repo_branch
+	else
+	    git checkout remotes/origin/$repo_branch -b $repo_branch
+	fi
+    fi
+}

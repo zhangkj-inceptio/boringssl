@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# Copyright 2021 NXP
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+
+clean_firmware_components() {
+    rm -rf $FBOUTDIR/firmware
+    rm -rf $PACKAGES_PATH/firmware/atf/build
+
+    [ -d $PACKAGES_PATH/firmware/rcw ] && \
+    $MAKE clean -C $PACKAGES_PATH/firmware/rcw
+
+    [ -d $PACKAGES_PATH/firmware/mc_utils/config ] &&
+    $MAKE clean -C $PACKAGES_PATH/firmware/mc_utils/config
+}
+
+
+clean_linux_components() {
+    rm -rf $FBOUTDIR/linux
+}
+
+
+clean_apps_components() {
+    # staging build directory
+    rm -rf $FBOUTDIR/apps
+
+    # networking
+    rm -rf $PACKAGES_PATH/apps/networking/dpdk/build_arm64*
+    rm -rf $PACKAGES_PATH/apps/networking/pktgen_dpdk/build_arm64*
+
+    [ -d $PACKAGES_PATH/apps/networking/vpp/build-root ] && \
+    $MAKE distclean -C $PACKAGES_PATH/apps/networking/vpp/build-root
+
+    [ -d $PACKAGES_PATH/apps/networking/fmc/source ] && \
+    $MAKE clean -C $PACKAGES_PATH/apps/networking/fmc/source
+
+    # security
+    [ -d $PACKAGES_PATH/apps/security/optee_os ] && \
+    $MAKE clean -C $PACKAGES_PATH/apps/security/optee_os ARCH=arm
+
+    [ -d $PACKAGES_PATH/apps/security/optee_client ] && \
+    $MAKE clean -C $PACKAGES_PATH/apps/security/optee_client
+
+    [ -d $PACKAGES_PATH/apps/security/keyctl_caam ] && \
+    $MAKE clean -C $PACKAGES_PATH/apps/security/keyctl_caam
+
+    [ -d $PACKAGES_PATH/apps/security/libpkcs11 ] && \
+    $MAKE clean -C $PACKAGES_PATH/apps/security/libpkcs11
+
+    rm -rf $PACKAGES_PATH/apps/security/optee_test/out
+
+    # graphics
+    rm -rf $PACKAGES_PATH/apps/graphics/libdrm/build
+    rm -rf $PACKAGES_PATH/apps/graphics/weston/arm64_build
+}
